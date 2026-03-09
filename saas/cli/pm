@@ -1,0 +1,375 @@
+#!/bin/bash
+set -e
+
+API="${PM_API_URL:-https://pm-saas.mattzcarey.workers.dev}"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+DIM='\033[2m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# Minimal JSON string extractor — no python3/jq needed
+# Usage: echo '{"key":"val"}' | jval key
+jval() {
+  sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p" | head -1
+}
+jnum() {
+  sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\\([0-9]*\\).*/\\1/p" | head -1
+}
+
+api() {
+  local method="$1" path="$2" data="$3"
+  if [ -n "$data" ]; then
+    curl -s -X "$method" "${API}${path}" -H "Content-Type: application/json" -d "$data"
+  else
+    curl -s -X "$method" "${API}${path}"
+  fi
+}
+
+# Pretty-print JSON array of objects, one per line
+# Each line is a JSON object. We parse with sed.
+print_items() {
+  local input="$1"
+  # Split array into lines (one object per line)
+  echo "$input" | tr '[' '\n' | tr ']' '\n' | tr '}' '\n' | grep '{' | while IFS= read -r line; do
+    echo "${line#,}"
+  done
+}
+
+usage() {
+  echo -e "${BOLD}pm${NC} — Project Management CLI"
+  echo ""
+  echo -e "${DIM}Usage:${NC} pm <command> [subcommand] [options]"
+  echo ""
+  echo -e "${BOLD}Commands:${NC}"
+  echo -e "  ${GREEN}projects${NC}    Manage projects"
+  echo -e "  ${GREEN}tasks${NC}       Manage tasks"
+  echo -e "  ${GREEN}sprints${NC}     Manage sprints"
+  echo -e "  ${GREEN}comments${NC}    Manage comments"
+  echo -e "  ${GREEN}stats${NC}       Show dashboard stats"
+  echo ""
+  echo -e "${BOLD}Examples:${NC}"
+  echo -e "  pm projects list"
+  echo -e "  pm projects create --name 'My Project'"
+  echo -e "  pm tasks create --project-id <id> --title 'Fix bug' --priority high"
+  echo -e "  pm tasks list --project-id <id> --status todo"
+  echo -e "  pm tasks update <id> --status done --assignee 'Matt'"
+  echo -e "  pm sprints create --project-id <id> --name 'Sprint 1'"
+  echo -e "  pm comments add --task-id <id> --content 'Looks good'"
+  echo -e "  pm stats"
+}
+
+# ─── Projects ────────────────────────────────────────────────────────────────
+
+cmd_projects() {
+  local sub="${1:-help}"; shift 2>/dev/null || true
+  case "$sub" in
+    list|ls)
+      echo -e "${BOLD}Projects${NC}"
+      local data
+      data=$(api GET /api/projects)
+      if [ -z "$data" ] || [ "$data" = "[]" ]; then
+        echo "  No projects yet. Create one with: pm projects create --name \"My Project\""
+      else
+        echo "$data" | sed 's/},{/}\n{/g' | sed 's/^\[//;s/\]$//' | while IFS= read -r row; do
+          local id name desc
+          id=$(echo "$row" | jval id)
+          name=$(echo "$row" | jval name)
+          desc=$(echo "$row" | jval description)
+          echo -e "  ${CYAN}${id:0:8}${NC}  ${name}  ${DIM}${desc}${NC}"
+        done
+      fi
+      ;;
+    create)
+      local name="" desc=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --name|-n) name="$2"; shift 2 ;;
+          --description|-d) desc="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      if [ -z "$name" ]; then echo -e "${RED}Error: --name is required${NC}"; return 1; fi
+      local result
+      result=$(api POST /api/projects "{\"name\":\"$name\",\"description\":\"$desc\"}")
+      local rid
+      rid=$(echo "$result" | jval id)
+      echo -e "${GREEN}✓${NC} Project created (${CYAN}${rid:0:8}${NC})"
+      echo "  $result"
+      ;;
+    get)
+      local id="$1"
+      if [ -z "$id" ]; then echo -e "${RED}Error: project ID required${NC}"; return 1; fi
+      api GET "/api/projects/$id"
+      echo ""
+      ;;
+    delete|rm)
+      local id="$1"
+      if [ -z "$id" ]; then echo -e "${RED}Error: project ID required${NC}"; return 1; fi
+      api DELETE "/api/projects/$id" > /dev/null
+      echo -e "${RED}✓${NC} Project deleted"
+      ;;
+    *)
+      echo -e "${BOLD}pm projects${NC} — Manage projects"
+      echo ""
+      echo -e "  ${GREEN}list${NC}                         List all projects"
+      echo -e "  ${GREEN}create${NC} --name <n> [--description <d>]  Create a project"
+      echo -e "  ${GREEN}get${NC} <id>                     Get project details"
+      echo -e "  ${GREEN}delete${NC} <id>                  Delete a project"
+      ;;
+  esac
+}
+
+# ─── Tasks ───────────────────────────────────────────────────────────────────
+
+cmd_tasks() {
+  local sub="${1:-help}"; shift 2>/dev/null || true
+  case "$sub" in
+    list|ls)
+      local project_id="" status="" priority="" assignee=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --project-id|-p) project_id="$2"; shift 2 ;;
+          --status|-s) status="$2"; shift 2 ;;
+          --priority) priority="$2"; shift 2 ;;
+          --assignee|-a) assignee="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      local qs=""
+      [ -n "$status" ] && qs="${qs}status=$status&"
+      [ -n "$priority" ] && qs="${qs}priority=$priority&"
+      [ -n "$assignee" ] && qs="${qs}assignee=$assignee&"
+      local path="/api/tasks"
+      [ -n "$project_id" ] && path="/api/projects/$project_id/tasks"
+      [ -n "$qs" ] && path="${path}?${qs%&}"
+      echo -e "${BOLD}Tasks${NC}"
+      local data
+      data=$(api GET "$path")
+      if [ -z "$data" ] || [ "$data" = "[]" ]; then
+        echo "  No tasks found."
+      else
+        echo "$data" | sed 's/},{/}\n{/g' | sed 's/^\[//;s/\]$//' | while IFS= read -r row; do
+          local id title st prio asgn
+          id=$(echo "$row" | jval id)
+          title=$(echo "$row" | jval title)
+          st=$(echo "$row" | jval status)
+          prio=$(echo "$row" | jval priority)
+          asgn=$(echo "$row" | jval assignee)
+          local sc=""
+          case "$st" in
+            todo) sc="$YELLOW" ;;
+            in_progress) sc="$BLUE" ;;
+            in_review) sc="$CYAN" ;;
+            done) sc="$GREEN" ;;
+          esac
+          local asgn_str=""
+          [ -n "$asgn" ] && asgn_str=" → $asgn"
+          printf "  ${CYAN}%.8s${NC}  ${sc}%-12s${NC} [${prio}] ${title}${asgn_str}\n" "$id" "$st"
+        done
+      fi
+      ;;
+    create)
+      local project_id="" title="" desc="" status="todo" priority="medium" assignee="" sprint_id=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --project-id|-p) project_id="$2"; shift 2 ;;
+          --title|-t) title="$2"; shift 2 ;;
+          --description|-d) desc="$2"; shift 2 ;;
+          --status|-s) status="$2"; shift 2 ;;
+          --priority) priority="$2"; shift 2 ;;
+          --assignee|-a) assignee="$2"; shift 2 ;;
+          --sprint-id) sprint_id="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      if [ -z "$project_id" ] || [ -z "$title" ]; then
+        echo -e "${RED}Error: --project-id and --title are required${NC}"; return 1
+      fi
+      local body="{\"title\":\"$title\",\"description\":\"$desc\",\"status\":\"$status\",\"priority\":\"$priority\",\"assignee\":\"$assignee\"$([ -n "$sprint_id" ] && echo ",\"sprintId\":\"$sprint_id\"")}"
+      local result
+      result=$(api POST "/api/projects/$project_id/tasks" "$body")
+      local rid
+      rid=$(echo "$result" | jval id)
+      echo -e "${GREEN}✓${NC} Task created (${CYAN}${rid:0:8}${NC})"
+      echo "  $result"
+      ;;
+    update)
+      local id="$1"; shift 2>/dev/null || true
+      if [ -z "$id" ]; then echo -e "${RED}Error: task ID required${NC}"; return 1; fi
+      local body="{"
+      local first=true
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --title|-t) [ "$first" = false ] && body="$body,"; body="$body\"title\":\"$2\""; first=false; shift 2 ;;
+          --status|-s) [ "$first" = false ] && body="$body,"; body="$body\"status\":\"$2\""; first=false; shift 2 ;;
+          --priority) [ "$first" = false ] && body="$body,"; body="$body\"priority\":\"$2\""; first=false; shift 2 ;;
+          --assignee|-a) [ "$first" = false ] && body="$body,"; body="$body\"assignee\":\"$2\""; first=false; shift 2 ;;
+          --sprint-id) [ "$first" = false ] && body="$body,"; body="$body\"sprintId\":\"$2\""; first=false; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      body="$body}"
+      local result
+      result=$(api PATCH "/api/tasks/$id" "$body")
+      echo -e "${GREEN}✓${NC} Task updated"
+      echo "  $result"
+      ;;
+    get)
+      local id="$1"
+      if [ -z "$id" ]; then echo -e "${RED}Error: task ID required${NC}"; return 1; fi
+      api GET "/api/tasks/$id"
+      echo ""
+      ;;
+    delete|rm)
+      local id="$1"
+      if [ -z "$id" ]; then echo -e "${RED}Error: task ID required${NC}"; return 1; fi
+      api DELETE "/api/tasks/$id" > /dev/null
+      echo -e "${RED}✓${NC} Task deleted"
+      ;;
+    *)
+      echo -e "${BOLD}pm tasks${NC} — Manage tasks"
+      echo ""
+      echo -e "  ${GREEN}list${NC} [--project-id <id>] [--status <s>] [--assignee <a>]"
+      echo -e "  ${GREEN}create${NC} --project-id <id> --title <t> [--priority high] [--assignee <a>]"
+      echo -e "  ${GREEN}update${NC} <id> [--status done] [--assignee <a>] [--priority <p>]"
+      echo -e "  ${GREEN}get${NC} <id>"
+      echo -e "  ${GREEN}delete${NC} <id>"
+      ;;
+  esac
+}
+
+# ─── Sprints ─────────────────────────────────────────────────────────────────
+
+cmd_sprints() {
+  local sub="${1:-help}"; shift 2>/dev/null || true
+  case "$sub" in
+    list|ls)
+      local project_id="$1"
+      if [ -z "$project_id" ]; then echo -e "${RED}Error: project ID required${NC}"; return 1; fi
+      echo -e "${BOLD}Sprints${NC}"
+      local data
+      data=$(api GET "/api/projects/$project_id/sprints")
+      if [ -z "$data" ] || [ "$data" = "[]" ]; then
+        echo "  No sprints yet."
+      else
+        echo "$data" | sed 's/},{/}\n{/g' | sed 's/^\[//;s/\]$//' | while IFS= read -r row; do
+          local id name st
+          id=$(echo "$row" | jval id)
+          name=$(echo "$row" | jval name)
+          st=$(echo "$row" | jval status)
+          echo -e "  ${CYAN}${id:0:8}${NC}  ${name}  ${YELLOW}${st}${NC}"
+        done
+      fi
+      ;;
+    create)
+      local project_id="" name="" start="" end=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --project-id|-p) project_id="$2"; shift 2 ;;
+          --name|-n) name="$2"; shift 2 ;;
+          --start) start="$2"; shift 2 ;;
+          --end) end="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      if [ -z "$project_id" ] || [ -z "$name" ]; then
+        echo -e "${RED}Error: --project-id and --name are required${NC}"; return 1
+      fi
+      local body="{\"name\":\"$name\"$([ -n "$start" ] && echo ",\"startDate\":\"$start\"")$([ -n "$end" ] && echo ",\"endDate\":\"$end\"")}"
+      local result
+      result=$(api POST "/api/projects/$project_id/sprints" "$body")
+      echo -e "${GREEN}✓${NC} Sprint created"
+      echo "  $result"
+      ;;
+    *)
+      echo -e "${BOLD}pm sprints${NC} — Manage sprints"
+      echo ""
+      echo -e "  ${GREEN}list${NC} <project-id>"
+      echo -e "  ${GREEN}create${NC} --project-id <id> --name <n> [--start <date>] [--end <date>]"
+      ;;
+  esac
+}
+
+# ─── Comments ────────────────────────────────────────────────────────────────
+
+cmd_comments() {
+  local sub="${1:-help}"; shift 2>/dev/null || true
+  case "$sub" in
+    list|ls)
+      local task_id="$1"
+      if [ -z "$task_id" ]; then echo -e "${RED}Error: task ID required${NC}"; return 1; fi
+      echo -e "${BOLD}Comments${NC}"
+      local data
+      data=$(api GET "/api/tasks/$task_id/comments")
+      if [ -z "$data" ] || [ "$data" = "[]" ]; then
+        echo "  No comments yet."
+      else
+        echo "$data" | sed 's/},{/}\n{/g' | sed 's/^\[//;s/\]$//' | while IFS= read -r row; do
+          local author content
+          author=$(echo "$row" | jval author)
+          content=$(echo "$row" | jval content)
+          echo -e "  ${CYAN}${author}${NC}  ${content}"
+        done
+      fi
+      ;;
+    add)
+      local task_id="" content="" author=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --task-id|-t) task_id="$2"; shift 2 ;;
+          --content|-c) content="$2"; shift 2 ;;
+          --author|-a) author="$2"; shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      if [ -z "$task_id" ] || [ -z "$content" ]; then
+        echo -e "${RED}Error: --task-id and --content are required${NC}"; return 1
+      fi
+      local body="{\"content\":\"$content\"$([ -n "$author" ] && echo ",\"author\":\"$author\"")}"
+      local result
+      result=$(api POST "/api/tasks/$task_id/comments" "$body")
+      echo -e "${GREEN}✓${NC} Comment added"
+      echo "  $result"
+      ;;
+    *)
+      echo -e "${BOLD}pm comments${NC} — Manage comments"
+      echo ""
+      echo -e "  ${GREEN}list${NC} <task-id>"
+      echo -e "  ${GREEN}add${NC} --task-id <id> --content <text> [--author <name>]"
+      ;;
+  esac
+}
+
+# ─── Stats ───────────────────────────────────────────────────────────────────
+
+cmd_stats() {
+  echo -e "${BOLD}Dashboard${NC}"
+  local data
+  data=$(api GET /api/stats)
+  local projects tasks sprints comments
+  projects=$(echo "$data" | jnum projects)
+  tasks=$(echo "$data" | jnum tasks)
+  sprints=$(echo "$data" | jnum sprints)
+  comments=$(echo "$data" | jnum comments)
+  echo -e "  Projects:  ${BOLD}${projects}${NC}"
+  echo -e "  Tasks:     ${BOLD}${tasks}${NC}"
+  echo -e "  Sprints:   ${BOLD}${sprints}${NC}"
+  echo -e "  Comments:  ${BOLD}${comments}${NC}"
+}
+
+# ─── Main ────────────────────────────────────────────────────────────────────
+
+case "${1:-}" in
+  projects) shift; cmd_projects "$@" ;;
+  tasks) shift; cmd_tasks "$@" ;;
+  sprints) shift; cmd_sprints "$@" ;;
+  comments) shift; cmd_comments "$@" ;;
+  stats) cmd_stats ;;
+  --help|-h|help|"") usage ;;
+  *) echo -e "${RED}Unknown command: $1${NC}"; usage; exit 1 ;;
+esac

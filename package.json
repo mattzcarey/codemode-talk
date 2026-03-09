@@ -1,0 +1,43 @@
+{
+  "name": "codemode-talk",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "start": "vite dev",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
+    "types": "wrangler types env.d.ts"
+  },
+  "dependencies": {
+    "@cloudflare/ai-chat": "latest",
+    "@cloudflare/codemode": "https://pkg.pr.new/@cloudflare/codemode@1074",
+    "@cloudflare/sandbox": "^0.7.14",
+    "@cloudflare/vite-plugin": "^1.26.1",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0",
+    "agents": "latest",
+    "ai": "^6",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.19.1",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.13.1",
+    "streamdown": "^2.4.0",
+    "tailwind-merge": "^3.3.0",
+    "workers-ai-provider": "latest",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.7",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "@vitejs/plugin-react": "^4.4.1",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.0",
+    "wrangler": "^4.71.0"
+  }
+}

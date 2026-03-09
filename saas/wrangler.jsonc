@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pm-saas",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "543fbdef1eeaed8a02c251c8c4d9510b",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pm-saas",
+      "database_id": "235e4b20-9b99-48f1-a947-d79773ed5c69"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

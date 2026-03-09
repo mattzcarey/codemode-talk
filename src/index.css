@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import "streamdown/styles.css";
+
+/* ===== FONT LOADING ===== */
+@font-face {
+  font-family: "FT Kunst Grotesk";
+  src: url("/fonts/Kunst Grotesk Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "FT Kunst Grotesk";
+  src: url("/fonts/Kunst Grotesk Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Apercu Mono Pro";
+  src: url("/fonts/Apercu Mono Pro Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== THEME CONFIGURATION ===== */
+@theme {
+  /* Core Colors */
+  --color-accent-100: #ff4801;
+  --color-accent-200: #ff7038;
+
+  --color-background-100: #fffbf5;
+  --color-background-200: #fffdfb;
+  --color-background-300: #fef7ed;
+
+  --color-foreground-100: #521000;
+  --color-foreground-200: #52100080;
+
+  --color-border-100: #ebd5c1;
+
+  /* Product Category Colors */
+  --color-compute-100: #0a95ff;
+  --color-compute-200: #0a95ff1a;
+  --color-storage-100: #ee0ddb;
+  --color-storage-200: #ee0ddb1a;
+  --color-ai-100: #19e306;
+  --color-ai-200: #19e3061a;
+  --color-media-100: #9616ff;
+  --color-media-200: #9616ff1a;
+
+  /* Typography */
+  --font-sans: "FT Kunst Grotesk", system-ui, sans-serif;
+  --font-mono: "Apercu Mono Pro", monospace;
+}
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    @apply border-border-100;
+  }
+
+  html {
+    @apply bg-background-100 text-foreground-100;
+  }
+
+  body {
+    @apply min-h-screen w-full overflow-hidden;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1 {
+    @apply text-[2.5rem] leading-[99%] font-medium tracking-[-0.03em] md:text-[4rem];
+    font-family: var(--font-sans);
+  }
+
+  h2 {
+    @apply text-[2rem] leading-[1em] font-medium tracking-[-0.035em] md:text-[3rem];
+    font-family: var(--font-sans);
+  }
+
+  h3 {
+    @apply text-[1.5rem] leading-[1.1em] font-medium tracking-[-0.02em] md:text-[2rem];
+    font-family: var(--font-sans);
+  }
+
+  h4 {
+    @apply text-[1.25rem] leading-[1.1em] font-medium tracking-[-0.02em] md:text-[1.5rem];
+    font-family: var(--font-sans);
+  }
+
+  p {
+    @apply text-[1.125rem] leading-[1.3em] font-normal tracking-[0];
+    font-family: var(--font-sans);
+  }
+
+  code {
+    @apply text-[0.875rem] leading-[1.3em] font-normal tracking-[0];
+    font-family: var(--font-mono);
+  }
+}
+
+/* ===== TEXT SELECTION ===== */
+::selection {
+  background-color: #ffe9e0;
+  color: #ff500a;
+}
