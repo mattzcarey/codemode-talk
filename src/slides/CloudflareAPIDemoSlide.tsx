@@ -57,7 +57,7 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
             <pre className="text-foreground-200 whitespace-pre-wrap break-all max-h-32 overflow-auto">{inputStr}</pre>
           )}
           {outputStr !== undefined && (
-            <pre className="text-compute-100/70 whitespace-pre-wrap break-all max-h-48 overflow-auto">{outputStr}</pre>
+            <pre className="text-foreground-100 whitespace-pre-wrap break-all max-h-48 overflow-auto">{outputStr}</pre>
           )}
           {toolPart.errorText && (
             <pre className="text-accent-100 whitespace-pre-wrap break-all">{toolPart.errorText}</pre>
@@ -68,7 +68,34 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   )
 }
 
+const SESSION_KEY = "cf-mcp-session"
+
+function getOrCreateSessionId(): string {
+  let id = localStorage.getItem(SESSION_KEY)
+  if (!id) {
+    id = crypto.randomUUID()
+    localStorage.setItem(SESSION_KEY, id)
+  }
+  return id
+}
+
 export function CloudflareAPIDemoSlide() {
+  const [sessionId, setSessionId] = useState(getOrCreateSessionId)
+
+  const reset = useCallback(() => {
+    const id = crypto.randomUUID()
+    localStorage.setItem(SESSION_KEY, id)
+    setSessionId(id)
+  }, [])
+
+  return (
+    <SlideContainer showDots={false}>
+      <CloudflareAPIChat key={sessionId} sessionId={sessionId} onReset={reset} />
+    </SlideContainer>
+  )
+}
+
+function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset: () => void }) {
   const [input, setInput] = useState("")
   const [mcpState, setMcpState] = useState<MCPServersState>({
     prompts: [],
@@ -83,6 +110,7 @@ export function CloudflareAPIDemoSlide() {
 
   const agent = useAgent({
     agent: "cloudflare-api",
+    name: sessionId,
     onMcpUpdate: useCallback((state: MCPServersState) => setMcpState(state), []),
   })
 
@@ -122,7 +150,7 @@ export function CloudflareAPIDemoSlide() {
 
   const send = useCallback(async () => {
     const text = input.trim()
-    if (!text || isStreaming) return
+    if (!text) return
     setInput("")
 
     if (isReady) {
@@ -141,7 +169,7 @@ export function CloudflareAPIDemoSlide() {
       pendingMessageRef.current = null
       setInput(text)
     }
-  }, [input, isStreaming, isReady, agent, sendMessage])
+  }, [input, isReady, agent, sendMessage])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -157,19 +185,18 @@ export function CloudflareAPIDemoSlide() {
   const hasPending = pendingMessageRef.current !== null
 
   return (
-    <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-3 w-full max-w-4xl h-full max-h-[80vh]">
-        <div className="text-center shrink-0">
-          <h2 className="text-foreground-100">
-            <span className="text-accent-100">Cloudflare MCP</span> Demo
-          </h2>
-          <p className="text-foreground-200 text-sm mt-1">
-            Real Cloudflare API via remote MCP server
-          </p>
-        </div>
+    <div className="flex flex-col items-center gap-3 w-full max-w-4xl h-full max-h-[80vh]">
+      <div className="text-center shrink-0">
+        <h2 className="text-foreground-100">
+          <span className="text-accent-100">Cloudflare</span> MCP
+        </h2>
+        <p className="text-foreground-200 text-sm mt-1">
+          Real Cloudflare API via remote MCP server
+        </p>
+      </div>
 
-        <div className="w-full flex-1 min-h-0 rounded-lg border border-border-100 bg-background-200 overflow-hidden flex flex-col">
-          {/* Header */}
+      <div className="w-full flex-1 min-h-0 rounded-lg border border-border-100 bg-background-200 overflow-hidden flex flex-col">
+        {/* Header */}
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-100 shrink-0">
             <div className={`size-2 rounded-full ${
               isReady ? "bg-ai-100" : isConnecting || hasPending ? "bg-media-100" : connectError ? "bg-accent-100" : "bg-foreground-200/30"
@@ -188,14 +215,12 @@ export function CloudflareAPIDemoSlide() {
               <span className="text-[12px] text-accent-100">connection failed</span>
             )}
             <span className="text-[12px] text-media-100 font-mono ml-auto">MCP client</span>
-            {messages.length > 0 && (
-              <button
-                onClick={() => { stop(); clearHistory() }}
-                className="text-[12px] text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
-              >
-                clear
-              </button>
-            )}
+            <button
+              onClick={onReset}
+              className="text-[12px] text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
+            >
+              reset
+            </button>
           </div>
 
           {/* Messages */}
@@ -300,33 +325,42 @@ export function CloudflareAPIDemoSlide() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask Cloudflare anything..."
-                disabled={isStreaming || hasPending}
+                disabled={hasPending}
                 className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-sm text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-ai-100 disabled:opacity-50"
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isStreaming || hasPending}
-                className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
-              >
-                Send
-              </button>
+              {isStreaming ? (
+                <button
+                  type="button"
+                  onClick={() => stop()}
+                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-sm font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
+                >
+                  Stop
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim() || hasPending}
+                  className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
+                >
+                  Send
+                </button>
+              )}
             </div>
           </form>
         </div>
 
-        {/* Bottom note */}
-        <div className="flex gap-6 text-[13px] text-foreground-200 shrink-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-ai-100">mcp.cloudflare.com/mcp</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-media-100">OAuth</span> · MCP client
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-compute-100">2,500+</span> endpoints
-          </div>
+      {/* Bottom note */}
+      <div className="flex gap-6 text-[13px] text-foreground-200 shrink-0">
+        <div className="flex items-center gap-1.5">
+          <span className="text-ai-100">mcp.cloudflare.com/mcp</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-media-100">OAuth</span> · MCP client
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-compute-100">2,500+</span> endpoints
         </div>
       </div>
-    </SlideContainer>
+    </div>
   )
 }

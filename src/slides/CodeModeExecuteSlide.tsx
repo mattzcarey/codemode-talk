@@ -1,27 +1,65 @@
 import { SlideContainer } from "@/components"
 import { useState, useRef } from "react"
 
-const defaultCode = `const projects = await codemode.listProjects();
+const templates = [
+  {
+    label: "List Projects",
+    code: `const projects = await codemode.listProjects();
 console.log("Found", projects.length, "projects");
 
-const first = projects[0];
-if (!first) return { error: "No projects found" };
-
-console.log("Fetching tasks for:", first.name);
-const tasks = await codemode.listProjectTasks({
-  projectId: first.id
+return projects.map(p => ({
+  name: p.name,
+  id: p.id
+}));`,
+  },
+  {
+    label: "Create Project",
+    code: `const project = await codemode.createProject({
+  name: "Node Congress Demo",
+  description: "Created live on stage"
 });
-console.log("Found", tasks.length, "tasks");
+console.log("Created:", project.name);
 
-return {
-  project: first.name,
-  taskCount: tasks.length,
-  tasks: tasks.map(t => ({
-    title: t.title,
-    status: t.status,
-    priority: t.priority
-  }))
-};`
+return project;`,
+  },
+  {
+    label: "Create Task",
+    code: `const projects = await codemode.listProjects();
+const project = projects[0];
+if (!project) return { error: "No projects" };
+
+const task = await codemode.createTask({
+  projectId: project.id,
+  title: "Ship Code Mode",
+  priority: "critical",
+  status: "in_progress",
+  assignee: "Matt"
+});
+
+return task;`,
+  },
+  {
+    label: "Assign Last Task",
+    code: `const projects = await codemode.listProjects();
+const project = projects[0];
+if (!project) return { error: "No projects" };
+
+const tasks = await codemode.listProjectTasks({
+  projectId: project.id
+});
+const last = tasks[tasks.length - 1];
+if (!last) return { error: "No tasks" };
+
+const updated = await codemode.updateTask({
+  id: last.id,
+  assignee: "Matt",
+  status: "in_progress"
+});
+console.log("Assigned", updated.title, "to Matt");
+
+return updated;`,
+  },
+]
 
 interface LogEntry {
   direction: "out" | "in" | "status"
@@ -29,7 +67,7 @@ interface LogEntry {
 }
 
 export function CodeModeExecuteSlide() {
-  const [code, setCode] = useState(defaultCode)
+  const [code, setCode] = useState(templates[0].code)
   const [output, setOutput] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
   const [logs, setLogs] = useState<LogEntry[]>([])
@@ -61,8 +99,8 @@ export function CodeModeExecuteSlide() {
     addLog({ direction: "status", text: "Executing..." })
 
     try {
-      // Server wraps in async () => { ... } and executes in V8 isolate
-      const resp = await fetch("/api/execute", {
+      // Uses DynamicWorkerExecutor with codemode.* proxy to PM tools
+      const resp = await fetch("/api/codemode-execute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
@@ -105,6 +143,24 @@ export function CodeModeExecuteSlide() {
           </p>
         </div>
 
+        {/* Template selector */}
+        <div className="flex items-center gap-2 w-full">
+          <span className="text-xs text-foreground-200">Templates:</span>
+          {templates.map((t) => (
+            <button
+              key={t.label}
+              onClick={() => { setCode(t.code); setOutput(null); setLogs([]) }}
+              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                code === t.code
+                  ? "bg-accent-100/20 text-accent-100 border border-accent-100/40"
+                  : "bg-background-200 text-foreground-200 border border-border-100 hover:text-foreground-100"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex gap-4 w-full flex-1 min-h-0">
           {/* Left: Code editor */}
           <div className="flex-1 flex flex-col gap-2 min-w-0">
@@ -132,20 +188,8 @@ export function CodeModeExecuteSlide() {
             />
           </div>
 
-          {/* Right: V8 diagram + Execution log + output */}
+          {/* Right: Execution log + output */}
           <div className="w-72 shrink-0 flex flex-col gap-2">
-            {/* V8 isolates diagram */}
-            <div className="rounded-lg border border-compute-100/30 bg-compute-100/5 p-2">
-              <img
-                src="/workers-diagram.png"
-                alt="V8 isolates — many lightweight sandboxes sharing a single process"
-                className="w-full rounded"
-              />
-              <p className="text-[9px] text-foreground-200/50 text-center mt-1">
-                Each execution runs in its own V8 isolate — lightweight, sandboxed, instant startup
-              </p>
-            </div>
-
             {/* Execution log */}
             <span className="text-[12px] font-mono text-foreground-200">
               Execution Log
@@ -192,7 +236,7 @@ export function CodeModeExecuteSlide() {
             </span>
             <div className="rounded-lg border border-ai-100/40 bg-background-200 p-3 overflow-auto min-h-[8vh] max-h-[15vh]">
               {output ? (
-                <pre className="text-[12px] font-mono text-ai-100 whitespace-pre-wrap">
+                <pre className="text-[12px] font-mono text-foreground-100 whitespace-pre-wrap">
                   {output}
                 </pre>
               ) : (

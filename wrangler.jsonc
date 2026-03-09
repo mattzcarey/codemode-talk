@@ -20,15 +20,15 @@
         "class_name": "Sandbox"
       },
       {
-        "name": "CloudflareAPIAgent",
-        "class_name": "CloudflareAPIAgent"
+        "name": "CloudflareApi",
+        "class_name": "CloudflareApi"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["CodemodeTalk", "Sandbox", "CloudflareAPIAgent"]
+      "new_sqlite_classes": ["CodemodeTalk", "Sandbox", "CloudflareApi"]
     }
   ],
   "containers": [
@@ -40,7 +40,7 @@
     }
   ],
   "vars": {
-    "HOST": "http://localhost:8787"
+    "HOST": "http://localhost:5173"
   },
   "ai": {
     "binding": "AI"

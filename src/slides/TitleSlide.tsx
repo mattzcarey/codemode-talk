@@ -7,8 +7,7 @@ export function TitleSlide() {
         {/* Text content */}
         <div className="flex flex-col gap-4 text-center md:text-left">
           <h1 className="text-foreground-100">
-            Every API is a Tool for Agents
-            <br />
+            Every API is a Tool for Agents{" "}
             <span className="text-accent-100">with Code Mode</span>
           </h1>
 

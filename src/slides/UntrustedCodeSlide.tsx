@@ -18,7 +18,7 @@ export function UntrustedCodeSlide() {
   return (
     <SlideContainer showDots={false}>
       <div className="flex flex-col items-center gap-6 max-w-4xl scale-[0.9] md:scale-100 origin-top">
-        <h2 className="text-center text-foreground-100">Untrusted Code is Scary</h2>
+        <h2 className="text-center text-foreground-100">Untrusted Code is <span className="text-accent-100">Scary</span></h2>
 
         <div className="flex flex-col md:flex-row gap-6 w-full">
           {/* Left: what can go wrong */}
@@ -62,11 +62,6 @@ export function UntrustedCodeSlide() {
 
         {/* Bottom */}
         <div className="flex flex-col gap-3 w-full">
-          <div className="rounded-lg border border-accent-100/40 bg-accent-100/5 px-6 py-3">
-            <p className="text-center text-sm text-foreground-100">
-              This is why <span className="text-accent-100 font-medium">nobody is doing code mode yet</span>
-            </p>
-          </div>
           <div className="rounded-lg border border-border-100 bg-background-200 px-6 py-3">
             <p className="text-center text-sm text-foreground-200">
               You want the expressiveness of a <span className="text-accent-100 font-medium">real language</span>{" "}

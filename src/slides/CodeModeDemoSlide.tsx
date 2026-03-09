@@ -43,7 +43,7 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   const name = getToolName(toolPart)
 
   return (
-    <div className="rounded border border-ai-100/30 bg-ai-100/5 text-[12px] font-mono overflow-hidden mt-1">
+    <div className="rounded border border-border-100 bg-background-200 text-[12px] font-mono overflow-hidden mt-1">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-2 px-2 py-1 hover:bg-ai-100/10 transition-colors"
@@ -73,7 +73,7 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
             <pre className="text-foreground-200 whitespace-pre-wrap break-all">{toolPart.output.code}</pre>
           )}
           {toolPart.output?.result !== undefined && (
-            <pre className="text-ai-100/70 whitespace-pre-wrap break-all">
+            <pre className="text-foreground-100 whitespace-pre-wrap break-all">
               {typeof toolPart.output.result === "string"
                 ? toolPart.output.result
                 : JSON.stringify(toolPart.output.result, null, 2)}
@@ -95,7 +95,7 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   )
 }
 
-export function CloudflareMCPSlide() {
+export function CodeModeDemoSlide() {
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -103,7 +103,7 @@ export function CloudflareMCPSlide() {
     agent: "codemode-talk",
   })
 
-  const { messages, sendMessage, clearHistory, status } = useAgentChat({
+  const { messages, sendMessage, clearHistory, stop, status } = useAgentChat({
     agent,
   })
 
@@ -115,10 +115,10 @@ export function CloudflareMCPSlide() {
 
   const send = useCallback(() => {
     const text = input.trim()
-    if (!text || isStreaming) return
+    if (!text) return
     setInput("")
     sendMessage({ role: "user", parts: [{ type: "text", text }] })
-  }, [input, isStreaming, sendMessage])
+  }, [input, sendMessage])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -243,13 +243,23 @@ export function CloudflareMCPSlide() {
                 placeholder="Ask anything about your projects..."
                 className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-sm text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-ai-100"
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isStreaming}
-                className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
-              >
-                Send
-              </button>
+              {isStreaming ? (
+                <button
+                  type="button"
+                  onClick={() => stop()}
+                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-sm font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
+                >
+                  Stop
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
+                >
+                  Send
+                </button>
+              )}
             </div>
           </form>
         </div>

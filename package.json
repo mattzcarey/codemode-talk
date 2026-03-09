@@ -10,6 +10,7 @@
     "types": "wrangler types env.d.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.41",
     "@cloudflare/ai-chat": "latest",
     "@cloudflare/codemode": "https://pkg.pr.new/@cloudflare/codemode@1074",
     "@cloudflare/sandbox": "^0.7.14",

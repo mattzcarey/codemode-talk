@@ -113,8 +113,15 @@ export function WorkerLoadersSlide() {
                 </Highlight>
               </div>
 
-              {/* Features */}
+              {/* Features + diagram */}
               <div className="w-full md:w-64 flex flex-col gap-2">
+                <div className="rounded-lg border border-compute-100/30 bg-compute-100/5 p-2">
+                  <img
+                    src="/workers-diagram.png"
+                    alt="V8 isolates — many lightweight sandboxes sharing a single process"
+                    className="w-full rounded"
+                  />
+                </div>
                 {features.map((f) => (
                   <div
                     key={f.label}
