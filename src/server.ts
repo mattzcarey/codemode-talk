@@ -85,8 +85,7 @@ export class CloudflareApi extends AIChatAgent<Env> {
       model: openai("gpt-5.4"),
       system:
         "You are a Cloudflare assistant with access to the Cloudflare API via MCP tools. " +
-        "Use the provided tools to answer questions about the user's Cloudflare account. " +
-        "Be concise and show results clearly.",
+        "Use the provided tools to answer questions about the user's Cloudflare account. ",
       messages: pruneMessages({
         messages: await convertToModelMessages(this.messages),
         toolCalls: "before-last-2-messages",
@@ -125,17 +124,13 @@ export default {
     if (url.pathname === "/api/codemode-execute" && request.method === "POST") {
       try {
         const { code } = (await request.json()) as { code: string };
-        console.log("[codemode-execute] code length:", code.length);
         const executor = new DynamicWorkerExecutor({ loader: env.LOADER });
         const fns = buildFns(createTools());
-        console.log("[codemode-execute] tools:", Object.keys(fns).join(", "));
         const result = await executor.execute(code, fns);
-        console.log("[codemode-execute] result:", JSON.stringify(result).slice(0, 500));
         return Response.json(result);
       } catch (err) {
-        console.error("[codemode-execute] caught error:", err);
         return Response.json(
-          { error: err instanceof Error ? err.message : "Execution failed", stack: err instanceof Error ? err.stack : undefined, logs: [] },
+          { error: err instanceof Error ? err.message : "Execution failed", logs: [] },
           { status: 500 }
         );
       }

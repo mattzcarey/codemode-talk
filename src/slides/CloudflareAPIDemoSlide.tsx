@@ -114,7 +114,7 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
     onMcpUpdate: useCallback((state: MCPServersState) => setMcpState(state), []),
   })
 
-  const { messages, sendMessage, clearHistory, stop, status } = useAgentChat({ agent })
+  const { messages, sendMessage, stop, status } = useAgentChat({ agent })
 
   const isStreaming = status === "streaming"
   const servers = Object.entries(mcpState.servers)
