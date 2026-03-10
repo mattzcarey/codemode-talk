@@ -1,4 +1,5 @@
 import { SlideContainer } from "@/components"
+import { motion } from "framer-motion"
 
 export function WhyTokensSlide() {
   return (
@@ -17,9 +18,14 @@ export function WhyTokensSlide() {
             <div className="w-32 text-right">
               <p className="text-xs text-foreground-200">All tools in context</p>
             </div>
-            <div className="flex-1 h-8 rounded-lg bg-compute-100/20 border border-compute-100/30 relative overflow-hidden">
-              <div className="absolute inset-0 bg-compute-100/40" />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-mono font-medium text-compute-100">
+            <div className="flex-1 h-8 rounded-lg border border-compute-100/30 relative overflow-hidden">
+              <motion.div
+                className="absolute inset-y-0 left-0 bg-compute-100/40 rounded-lg"
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-mono font-medium text-compute-100 z-10">
                 1.17M tokens
               </span>
             </div>
@@ -31,13 +37,28 @@ export function WhyTokensSlide() {
               <p className="text-xs text-foreground-200">Code Mode</p>
             </div>
             <div className="flex items-center gap-3 flex-1">
-              <div className="h-8 w-2 rounded-lg bg-accent-100 border border-accent-100" />
-              <span className="text-sm font-mono font-medium text-accent-100">
+              <motion.div
+                className="h-8 rounded-lg bg-accent-100 border border-accent-100"
+                initial={{ width: 0 }}
+                animate={{ width: "0.5rem" }}
+                transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
+              />
+              <motion.span
+                className="text-sm font-mono font-medium text-accent-100"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 1.2 }}
+              >
                 ~1,000 tokens
-              </span>
-              <span className="rounded-full border border-accent-100/30 bg-accent-100/10 px-3 py-0.5 text-xs font-medium text-accent-100">
+              </motion.span>
+              <motion.span
+                className="rounded-full border border-accent-100/30 bg-accent-100/10 px-3 py-0.5 text-xs font-medium text-accent-100"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 1.5, ease: "easeOut" }}
+              >
                 99.9% reduction
-              </span>
+              </motion.span>
             </div>
           </div>
         </div>

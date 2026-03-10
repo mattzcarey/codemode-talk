@@ -1,4 +1,5 @@
 import { SlideContainer } from "@/components"
+import { motion } from "framer-motion"
 
 const benefits = [
   {
@@ -33,6 +34,29 @@ const benefits = [
   },
 ]
 
+const flowItems = [
+  { label: "Agent", sub: "writes code", color: "ai" },
+  { label: "MCP Server", sub: "search + execute", color: "accent" },
+  { label: "V8 Isolate", sub: "runs code", color: "compute" },
+  { label: "Tools", sub: "via RPC", color: "media" },
+]
+
+function Arrow({ delay }: { delay: number }) {
+  return (
+    <motion.div
+      className="flex items-center gap-1"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, delay }}
+    >
+      <div className="h-px w-8 bg-foreground-200/30" />
+      <svg className="size-3 text-foreground-200/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </motion.div>
+  )
+}
+
 export function BackToMCPSlide() {
   return (
     <SlideContainer>
@@ -48,77 +72,52 @@ export function BackToMCPSlide() {
 
         {/* Flow diagram */}
         <div className="w-full flex items-center justify-center gap-3">
-          {/* Agent */}
-          <div className="rounded-lg border border-ai-100/40 bg-ai-100/5 px-4 py-3 text-center">
-            <p className="text-xs font-medium text-ai-100">Agent</p>
-            <p className="text-[12px] text-foreground-200 mt-0.5">writes code</p>
-          </div>
-
-          {/* Arrow */}
-          <div className="flex items-center gap-1">
-            <div className="h-px w-8 bg-foreground-200/30" />
-            <svg className="size-3 text-foreground-200/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-          </div>
-
-          {/* Server */}
-          <div className="rounded-lg border border-accent-100/40 bg-accent-100/5 px-4 py-3 text-center">
-            <p className="text-xs font-medium text-accent-100">MCP Server</p>
-            <p className="text-[12px] text-foreground-200 mt-0.5">search + execute</p>
-          </div>
-
-          {/* Arrow */}
-          <div className="flex items-center gap-1">
-            <div className="h-px w-8 bg-foreground-200/30" />
-            <svg className="size-3 text-foreground-200/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-          </div>
-
-          {/* V8 Isolate */}
-          <div className="rounded-lg border border-compute-100/40 bg-compute-100/5 px-4 py-3 text-center">
-            <p className="text-xs font-medium text-compute-100">V8 Isolate</p>
-            <p className="text-[12px] text-foreground-200 mt-0.5">runs code</p>
-          </div>
-
-          {/* Arrow */}
-          <div className="flex items-center gap-1">
-            <div className="h-px w-8 bg-foreground-200/30" />
-            <svg className="size-3 text-foreground-200/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-          </div>
-
-          {/* Tools */}
-          <div className="rounded-lg border border-media-100/40 bg-media-100/5 px-4 py-3 text-center">
-            <p className="text-xs font-medium text-media-100">Tools</p>
-            <p className="text-[12px] text-foreground-200 mt-0.5">via RPC</p>
-          </div>
+          {flowItems.map((item, i) => (
+            <span key={item.label} className="contents">
+              <motion.div
+                className={`rounded-lg border border-${item.color}-100/40 bg-${item.color}-100/5 px-4 py-3 text-center`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.2, ease: "easeOut" }}
+              >
+                <p className={`text-xs font-medium text-${item.color}-100`}>{item.label}</p>
+                <p className="text-[12px] text-foreground-200 mt-0.5">{item.sub}</p>
+              </motion.div>
+              {i < flowItems.length - 1 && <Arrow delay={0.3 + i * 0.2} />}
+            </span>
+          ))}
         </div>
 
         {/* Benefits */}
         <div className="w-full flex flex-col gap-3">
-          {benefits.map((b) => (
-            <div
+          {benefits.map((b, i) => (
+            <motion.div
               key={b.title}
               className={`rounded-lg border border-${b.color}-100/40 bg-${b.color}-100/5 p-4 flex items-start gap-3`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 1.0 + i * 0.15, ease: "easeOut" }}
             >
               <div className={`text-${b.color}-100 shrink-0 mt-0.5`}>{b.icon}</div>
               <div>
                 <p className={`text-sm font-medium text-${b.color}-100`}>{b.title}</p>
                 <p className="text-xs text-foreground-200 mt-0.5">{b.description}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Callout */}
-        <div className="rounded-lg border border-accent-100 bg-accent-100/10 px-6 py-4 w-full">
+        <motion.div
+          className="rounded-lg border border-accent-100 bg-accent-100/10 px-6 py-4 w-full"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
+        >
           <p className="text-sm text-foreground-100 text-center">
             The agent is just a code writer. All the hard stuff runs on the server.
           </p>
-        </div>
+        </motion.div>
       </div>
     </SlideContainer>
   )

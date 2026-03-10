@@ -1,4 +1,5 @@
 import { SlideContainer } from "@/components"
+import { motion } from "framer-motion"
 
 const segments = [
   { label: "Tool Definitions", tokens: "1.17M", pct: 85, color: "bg-compute-100" },
@@ -32,18 +33,25 @@ export function ContextWindowSlide() {
             <p className="text-xs font-mono text-foreground-200">128K tokens</p>
           </div>
           <div className="flex h-12 w-full overflow-hidden rounded-lg border border-border-100">
-            {segments.map((seg) => (
-              <div
+            {segments.map((seg, i) => (
+              <motion.div
                 key={seg.label}
-                className={`${seg.color} flex items-center justify-center transition-all`}
-                style={{ width: `${seg.pct}%` }}
+                className={`${seg.color} flex items-center justify-center`}
+                initial={{ width: 0 }}
+                animate={{ width: `${seg.pct}%` }}
+                transition={{ duration: 0.8, delay: 0.3 + i * 0.15, ease: "easeOut" }}
               >
                 {seg.pct > 10 && (
-                  <span className="text-[12px] font-medium text-white truncate px-1">
+                  <motion.span
+                    className="text-[12px] font-medium text-white truncate px-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.8 + i * 0.15 }}
+                  >
                     {seg.label}
-                  </span>
+                  </motion.span>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
           <div className="flex gap-4 mt-3 justify-center flex-wrap">

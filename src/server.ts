@@ -9,7 +9,6 @@ import {
   convertToModelMessages,
   pruneMessages,
 } from "ai";
-import { createWorkersAI } from "workers-ai-provider";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createTools } from "./tools";
 
@@ -19,7 +18,7 @@ const tools = createTools();
 
 export class CodemodeTalk extends AIChatAgent<Env> {
   async onChatMessage() {
-    const workersai = createWorkersAI({ binding: this.env.AI });
+    const openai = createOpenAI({ apiKey: this.env.OPENAI_API_KEY });
     const executor = new DynamicWorkerExecutor({ loader: this.env.LOADER });
 
     const codemode = createCodeTool({
@@ -28,7 +27,7 @@ export class CodemodeTalk extends AIChatAgent<Env> {
     });
 
     const result = streamText({
-      model: workersai("@cf/zai-org/glm-4.7-flash"),
+      model: openai("gpt-5.4"),
       system:
         "You are a helpful project management assistant. " +
         "You can create and manage projects, tasks, sprints, and comments using the codemode tool. " +
@@ -126,13 +125,17 @@ export default {
     if (url.pathname === "/api/codemode-execute" && request.method === "POST") {
       try {
         const { code } = (await request.json()) as { code: string };
+        console.log("[codemode-execute] code length:", code.length);
         const executor = new DynamicWorkerExecutor({ loader: env.LOADER });
         const fns = buildFns(createTools());
+        console.log("[codemode-execute] tools:", Object.keys(fns).join(", "));
         const result = await executor.execute(code, fns);
+        console.log("[codemode-execute] result:", JSON.stringify(result).slice(0, 500));
         return Response.json(result);
       } catch (err) {
+        console.error("[codemode-execute] caught error:", err);
         return Response.json(
-          { error: err instanceof Error ? err.message : "Execution failed", logs: [] },
+          { error: err instanceof Error ? err.message : "Execution failed", stack: err instanceof Error ? err.stack : undefined, logs: [] },
           { status: 500 }
         );
       }

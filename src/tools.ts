@@ -8,7 +8,15 @@ async function api(path: string, options?: RequestInit) {
     ...options,
     headers: { "Content-Type": "application/json", ...options?.headers },
   });
-  return res.json();
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`API ${res.status}: ${text}`);
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Invalid JSON from API (${res.status}): ${text.slice(0, 200)}`);
+  }
 }
 
 /** Build the PM tools that call the SaaS API over HTTP. */

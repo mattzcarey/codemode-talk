@@ -42,7 +42,7 @@ export const slides = [
   { component: WhyTokensSlide, slug: "why-tokens" },
   { component: UntrustedCodeSlide, slug: "untrusted-code" },
   { component: WorkerLoadersSlide, slug: "worker-loaders" },
-  { component: CodeModeDemoSlide, slug: "cloudflare-mcp" },
+  { component: CodeModeDemoSlide, slug: "code-mode-demo" },
   { component: BackToMCPSlide, slug: "back-to-mcp" },
   { component: CloudflareAPIDemoSlide, slug: "cf-api-demo" },
   { component: FindOutMoreSlide, slug: "find-out-more" },
@@ -128,55 +128,70 @@ export default function App() {
   const CurrentSlideComponent = slides[currentSlide].component
 
   return (
-    <div className="relative h-screen w-screen bg-background-100">
-      <div className="h-full w-full p-4 md:p-8">
+    <div className="relative flex h-screen w-screen flex-col bg-background-100">
+      {/* Slide area — border stops above the nav strip */}
+      <div className="flex-1 min-h-0 p-6 pb-3 md:p-12 md:pb-3">
         <AnimatePresence mode="wait">
           <CurrentSlideComponent key={currentSlide} />
         </AnimatePresence>
       </div>
 
-      {/* Navigation dots */}
-      <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
-        {slides.map((_, index) => (
+      {/* Nav strip below the slide border */}
+      <div className="relative flex shrink-0 items-center justify-center px-6 pt-2 pb-4 md:px-12">
+        {/* Navigation dots — centered */}
+        <div className="flex items-center gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`size-2 rounded-full transition-all duration-200 ${
+                index === currentSlide
+                  ? "scale-125 bg-accent-100"
+                  : "bg-border-100 hover:bg-accent-200"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Arrows + counter + fullscreen — right */}
+        <div className="absolute right-6 md:right-12 flex items-center gap-3">
           <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`size-2.5 rounded-full transition-all duration-200 ${
-              index === currentSlide
-                ? "scale-125 bg-accent-100"
-                : "bg-border-100 hover:bg-accent-200"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Slide counter and fullscreen */}
-      <div className="absolute bottom-4 right-4 z-20 flex items-center gap-3">
-        <span className="font-mono text-sm text-foreground-200">
-          {currentSlide + 1} / {slides.length}
-        </span>
-        <button
-          onClick={toggleFullscreen}
-          className="flex items-center justify-center size-8 rounded border border-border-100 bg-background-200 text-foreground-200 hover:bg-background-100 hover:text-accent-100 transition-colors"
-          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-          title="Toggle fullscreen (F)"
-        >
-          {isFullscreen ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-            </svg>
-          )}
-        </button>
-      </div>
-
-      {/* Navigation hint */}
-      <div className="absolute bottom-4 left-4 z-20 hidden font-mono text-xs text-foreground-200/50 md:block">
-        Use arrow keys to navigate
+            onClick={prevSlide}
+            disabled={currentSlide === 0}
+            className="font-mono text-sm text-foreground-200 hover:text-accent-100 disabled:opacity-20 transition-colors"
+            aria-label="Previous slide"
+          >
+            ←
+          </button>
+          <span className="font-mono text-sm text-foreground-200">
+            {currentSlide + 1}/{slides.length}
+          </span>
+          <button
+            onClick={nextSlide}
+            disabled={currentSlide === slides.length - 1}
+            className="font-mono text-sm text-foreground-200 hover:text-accent-100 disabled:opacity-20 transition-colors"
+            aria-label="Next slide"
+          >
+            →
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center justify-center size-7 rounded border border-border-100 bg-background-200 text-foreground-200 hover:bg-background-100 hover:text-accent-100 transition-colors"
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            title="Toggle fullscreen (F)"
+          >
+            {isFullscreen ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
   "name": "codemode-talk",
   "main": "src/server.ts",
   "compatibility_date": "2026-01-28",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "account_id": "543fbdef1eeaed8a02c251c8c4d9510b",
   "assets": {
     "not_found_handling": "single-page-application",
@@ -28,7 +28,11 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["CodemodeTalk", "Sandbox", "CloudflareApi"]
+      "new_sqlite_classes": ["CodemodeTalk", "Sandbox"]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["CloudflareApi"]
     }
   ],
   "containers": [

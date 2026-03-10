@@ -4,60 +4,68 @@ import { useState, useRef } from "react"
 const templates = [
   {
     label: "List Projects",
-    code: `const projects = await codemode.listProjects();
-console.log("Found", projects.length, "projects");
+    code: `async () => {
+  const projects = await codemode.listProjects();
+  console.log("Found", projects.length, "projects");
 
-return projects.map(p => ({
-  name: p.name,
-  id: p.id
-}));`,
+  return projects.map(p => ({
+    name: p.name,
+    id: p.id
+  }));
+}`,
   },
   {
     label: "Create Project",
-    code: `const project = await codemode.createProject({
-  name: "Node Congress Demo",
-  description: "Created live on stage"
-});
-console.log("Created:", project.name);
+    code: `async () => {
+  const project = await codemode.createProject({
+    name: "Node Congress Demo",
+    description: "Created live on stage"
+  });
+  console.log("Created:", project.name);
 
-return project;`,
+  return project;
+}`,
   },
   {
     label: "Create Task",
-    code: `const projects = await codemode.listProjects();
-const project = projects[0];
-if (!project) return { error: "No projects" };
+    code: `async () => {
+  const projects = await codemode.listProjects();
+  const project = projects[0];
+  if (!project) return { error: "No projects" };
 
-const task = await codemode.createTask({
-  projectId: project.id,
-  title: "Ship Code Mode",
-  priority: "critical",
-  status: "in_progress",
-  assignee: "Matt"
-});
+  const task = await codemode.createTask({
+    projectId: project.id,
+    title: "Ship Code Mode",
+    priority: "critical",
+    status: "in_progress",
+    assignee: "Matt"
+  });
 
-return task;`,
+  return task;
+}`,
   },
   {
     label: "Assign Last Task",
-    code: `const projects = await codemode.listProjects();
-const project = projects[0];
-if (!project) return { error: "No projects" };
+    code: `async () => {
+  const projects = await codemode.listProjects();
+  const project = projects[0];
+  if (!project) return { error: "No projects" };
 
-const tasks = await codemode.listProjectTasks({
-  projectId: project.id
-});
-const last = tasks[tasks.length - 1];
-if (!last) return { error: "No tasks" };
+  const tasks = await codemode.listProjectTasks({
+    projectId: project.id
+  });
+  const last = tasks[tasks.length - 1];
+  if (!last) return { error: "No tasks" };
 
-const updated = await codemode.updateTask({
-  id: last.id,
-  assignee: "Matt",
-  status: "in_progress"
-});
-console.log("Assigned", updated.title, "to Matt");
+  const updated = await codemode.updateTask({
+    id: last.id,
+    assignee: "Matt",
+    status: "in_progress"
+  });
+  console.log("Assigned", updated.title, "to Matt");
 
-return updated;`,
+  return updated;
+}`,
   },
 ]
 
