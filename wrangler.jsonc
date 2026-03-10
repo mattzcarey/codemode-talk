@@ -44,7 +44,7 @@
     }
   ],
   "vars": {
-    "HOST": "http://localhost:5173"
+    "HOST": "https://codemode-talk.mattzcarey.workers.dev"
   },
   "ai": {
     "binding": "AI"
