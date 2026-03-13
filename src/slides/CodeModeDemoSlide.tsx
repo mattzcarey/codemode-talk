@@ -4,6 +4,7 @@ import { useAgentChat } from "@cloudflare/ai-chat/react"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { isToolUIPart } from "ai"
 import { Streamdown } from "streamdown"
+import { getOrCreateSessionId } from "@/utils"
 
 interface ToolPart {
   type: string
@@ -95,12 +96,16 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   )
 }
 
+const CODEMODE_SESSION_KEY = "codemode-session"
+
 export function CodeModeDemoSlide() {
+  const [sessionId] = useState(() => getOrCreateSessionId(CODEMODE_SESSION_KEY))
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const agent = useAgent({
     agent: "codemode-talk",
+    name: sessionId,
   })
 
   const { messages, sendMessage, clearHistory, stop, status } = useAgentChat({

@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { isToolUIPart } from "ai"
 import { Streamdown } from "streamdown"
 import type { MCPServersState } from "agents"
+import { getOrCreateSessionId } from "@/utils"
 
 interface ToolPart {
   type: string
@@ -70,17 +71,8 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
 
 const SESSION_KEY = "cf-mcp-session"
 
-function getOrCreateSessionId(): string {
-  let id = localStorage.getItem(SESSION_KEY)
-  if (!id) {
-    id = crypto.randomUUID()
-    localStorage.setItem(SESSION_KEY, id)
-  }
-  return id
-}
-
 export function CloudflareAPIDemoSlide() {
-  const [sessionId, setSessionId] = useState(getOrCreateSessionId)
+  const [sessionId, setSessionId] = useState(() => getOrCreateSessionId(SESSION_KEY))
 
   const reset = useCallback(() => {
     const id = crypto.randomUUID()
