@@ -78,19 +78,19 @@ export function ToolSearchSlide() {
 
   return (
     <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-3 w-full max-w-4xl">
+      <div className="flex flex-col items-center gap-8 w-full max-w-4xl">
         <div className="text-center">
           <h2 className="text-foreground-100">
-            <span className="text-ai-100">Tool Search</span>
+            <span className="text-accent-100">Tool Search</span>
           </h2>
-          <p className="text-foreground-200 text-sm mt-1">
-            The agent gets one tool: <span className="font-mono text-ai-100">search()</span> — to find the others
+          <p className="text-foreground-200 text-base mt-1">
+            The agent gets one tool: <span className="font-mono text-compute-100">search()</span> — to find the others
           </p>
         </div>
 
-        <div className="flex gap-4 w-full flex-1 min-h-0">
+        <div className="flex gap-8 w-full flex-1 min-h-0">
           {/* Left: search + results */}
-          <div className="flex-1 flex flex-col gap-3 min-w-0">
+          <div className="flex-1 flex flex-col gap-8 min-w-0">
             {/* Search box */}
             <div className="w-full relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -101,9 +101,9 @@ export function ToolSearchSlide() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search tools..."
-                className="w-full rounded-lg border border-border-100 bg-background-200 px-4 py-2.5 pl-10 text-sm text-foreground-100 font-mono placeholder:text-foreground-200/50 focus:outline-none focus:border-ai-100"
+                className="w-full rounded-lg border border-border-100 bg-background-200 px-5 py-2.5 pl-10 text-base text-foreground-100 font-mono placeholder:text-foreground-200/50 focus:outline-none focus:border-compute-100"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground-200/50 font-mono">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-base text-foreground-200/50 font-mono">
                 {tools.length} tools
               </span>
             </div>
@@ -116,11 +116,11 @@ export function ToolSearchSlide() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
                   <p className="text-sm">Type to search across {tools.length} tools</p>
-                  <p className="text-xs mt-1">Try "create task" or "sprint" or "delete"</p>
+                  <p className="text-base mt-1">Try "create task" or "sprint" or "delete"</p>
                 </div>
               )}
               {query !== "" && results.length === 0 && (
-                <p className="text-sm text-foreground-200 text-center py-4">No matching tools</p>
+                <p className="text-base text-foreground-200 text-center py-4">No matching tools</p>
               )}
               {results.slice(0, 8).map(({ tool, score }, i) => {
                 const isSelected = selected.has(tool.name)
@@ -128,15 +128,15 @@ export function ToolSearchSlide() {
                   <button
                     key={tool.name}
                     onClick={() => toggleSelect(tool.name)}
-                    className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors ${
+                    className={`flex items-center gap-8 rounded-lg border px-5 py-4 text-left transition-colors ${
                       isSelected
-                        ? "border-ai-100 bg-ai-100/10"
-                        : "border-border-100 bg-background-200 hover:border-ai-100/50"
+                        ? "border-compute-100 bg-compute-100/10"
+                        : "border-border-100 bg-background-200 hover:border-compute-100/50"
                     }`}
                   >
                     {/* Checkbox */}
                     <div className={`size-4 rounded border flex items-center justify-center shrink-0 ${
-                      isSelected ? "border-ai-100 bg-ai-100" : "border-foreground-200/30"
+                      isSelected ? "border-compute-100 bg-compute-100" : "border-foreground-200/30"
                     }`}>
                       {isSelected && (
                         <svg className="size-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -145,22 +145,22 @@ export function ToolSearchSlide() {
                       )}
                     </div>
 
-                    <span className="text-xs font-mono text-foreground-200/50 w-3">{i + 1}</span>
+                    <span className="text-base font-mono text-foreground-200/50 w-3">{i + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-compute-100">{tool.name}</span>
-                        <span className="text-[13px] text-foreground-200 truncate">{tool.description}</span>
+                        <span className="font-mono text-base text-compute-100">{tool.name}</span>
+                        <span className="text-base text-foreground-200 truncate">{tool.description}</span>
                       </div>
                     </div>
                     {/* Score bar */}
                     <div className="flex items-center gap-1.5 w-16 shrink-0">
                       <div className="flex-1 h-1 rounded-full bg-border-100 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-ai-100 transition-all"
+                          className="h-full rounded-full bg-compute-100 transition-all"
                           style={{ width: `${(score / maxScore) * 100}%` }}
                         />
                       </div>
-                      <span className="text-[9px] font-mono text-ai-100 w-4 text-right">
+                      <span className="text-[14px] font-mono text-compute-100 w-4 text-right">
                         {score.toFixed(0)}
                       </span>
                     </div>
@@ -168,7 +168,7 @@ export function ToolSearchSlide() {
                 )
               })}
               {results.length > 8 && (
-                <p className="text-xs text-foreground-200/50 text-center py-1">
+                <p className="text-base text-foreground-200/50 text-center py-1">
                   +{results.length - 8} more results
                 </p>
               )}
@@ -178,26 +178,26 @@ export function ToolSearchSlide() {
           {/* Right: context window */}
           <div className="w-64 shrink-0 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-foreground-200">Context Window</span>
-              <span className="text-[12px] font-mono text-foreground-200/50">
+              <span className="text-base font-mono text-foreground-200">Context Window</span>
+              <span className="text-base font-mono text-foreground-200/50">
                 ~{selectedTokens} tokens
               </span>
             </div>
-            <div className="flex-1 rounded-lg border border-border-100 bg-background-200 p-3 flex flex-col gap-1.5 overflow-auto max-h-[50vh]">
+            <div className="flex-1 rounded-lg border border-border-100 bg-background-200 p-6 flex flex-col gap-1.5 overflow-auto max-h-[50vh]">
               {selectedTools.length === 0 ? (
-                <p className="text-xs text-foreground-200/30 text-center py-6">
+                <p className="text-base text-foreground-200/30 text-center py-6">
                   Select tools to add to context
                 </p>
               ) : (
                 selectedTools.map((tool) => (
                   <div
                     key={tool.name}
-                    className="rounded border border-ai-100/20 bg-ai-100/5 px-2 py-1.5 flex items-start justify-between gap-1"
+                    className="rounded border border-compute-100/20 bg-compute-100/5 px-2 py-1.5 flex items-start justify-between gap-1"
                   >
                     <div className="min-w-0">
-                      <p className="font-mono text-[12px] text-ai-100 truncate">{tool.name}</p>
+                      <p className="font-mono text-base text-compute-100 truncate">{tool.name}</p>
                       {tool.parameters && (
-                        <p className="font-mono text-[9px] text-foreground-200/50 truncate">
+                        <p className="font-mono text-[14px] text-foreground-200/50 truncate">
                           ({tool.parameters})
                         </p>
                       )}
@@ -215,7 +215,7 @@ export function ToolSearchSlide() {
               )}
             </div>
             {selectedTools.length > 0 && (
-              <p className="text-[12px] text-foreground-200/50 text-center">
+              <p className="text-base text-foreground-200/50 text-center">
                 {selectedTools.length} of {tools.length} tools loaded
               </p>
             )}
@@ -223,9 +223,9 @@ export function ToolSearchSlide() {
         </div>
 
         {/* Callout */}
-        <div className="flex gap-4 text-xs text-foreground-200">
+        <div className="flex gap-8 text-base text-foreground-200">
           <div className="flex items-center gap-1.5">
-            <span className="text-ai-100">+</span> Only loads what's relevant
+            <span className="text-compute-100">+</span> Only loads what's relevant
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-accent-100">-</span> 1 tool = 1 API call. Complex workflows = many round trips.

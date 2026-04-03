@@ -4,20 +4,20 @@ import { motion } from "framer-motion"
 const segments = [
   { label: "Tool Definitions", tokens: "1.17M", pct: 85, color: "bg-compute-100" },
   { label: "System Prompt", tokens: "2K", pct: 5, color: "bg-accent-100" },
-  { label: "Conversation", tokens: "8K", pct: 7, color: "bg-ai-100" },
+  { label: "Conversation", tokens: "8K", pct: 7, color: "bg-storage-100" },
   { label: "Actual Task", tokens: "???", pct: 3, color: "bg-media-100" },
 ]
 
 export function ContextWindowSlide() {
   return (
     <SlideContainer>
-      <div className="flex flex-col items-center gap-8 max-w-3xl">
+      <div className="flex flex-col items-center gap-10 max-w-3xl">
         <h2 className="text-center text-foreground-100">
           We Filled the Context Window
         </h2>
 
         {/* Big number */}
-        <div className="flex items-baseline gap-4">
+        <div className="flex items-baseline gap-6">
           <span className="text-6xl md:text-7xl font-medium text-accent-100 tracking-tight">
             2.3M
           </span>
@@ -27,10 +27,10 @@ export function ContextWindowSlide() {
         </div>
 
         {/* Context window bar */}
-        <div className="w-full mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-foreground-200">CONTEXT WINDOW</p>
-            <p className="text-xs font-mono text-foreground-200">128K tokens</p>
+        <div className="w-full mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-base font-medium text-foreground-200">CONTEXT WINDOW</p>
+            <p className="text-base font-mono text-foreground-200">128K tokens</p>
           </div>
           <div className="flex h-12 w-full overflow-hidden rounded-lg border border-border-100">
             {segments.map((seg, i) => (
@@ -43,7 +43,7 @@ export function ContextWindowSlide() {
               >
                 {seg.pct > 10 && (
                   <motion.span
-                    className="text-[12px] font-medium text-white truncate px-1"
+                    className="text-base font-medium text-white truncate px-1"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.8 + i * 0.15 }}
@@ -54,20 +54,20 @@ export function ContextWindowSlide() {
               </motion.div>
             ))}
           </div>
-          <div className="flex gap-4 mt-3 justify-center flex-wrap">
+          <div className="flex gap-8 mt-4 justify-center flex-wrap">
             {segments.map((seg) => (
-              <div key={seg.label} className="flex items-center gap-1.5">
+              <div key={seg.label} className="flex items-center gap-2.5">
                 <div className={`size-2.5 rounded-sm ${seg.color}`} />
-                <span className="text-xs text-foreground-200">{seg.label}</span>
-                <span className="text-xs font-mono text-foreground-200/60">{seg.tokens}</span>
+                <span className="text-base text-foreground-200">{seg.label}</span>
+                <span className="text-base font-mono text-foreground-200/60">{seg.tokens}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Callout */}
-        <div className="rounded-lg border border-accent-100 bg-accent-100/10 px-6 py-3">
-          <p className="text-center text-sm font-medium text-accent-100">
+        <div className="rounded-lg border border-accent-100 bg-accent-100/10 px-8 py-4">
+          <p className="text-center text-base font-medium text-accent-100">
             The context limit is not an MCP problem. It's an Agent problem.
           </p>
         </div>

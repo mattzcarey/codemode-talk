@@ -2,7 +2,7 @@ import { SlideContainer } from "@/components"
 
 const rows = [
   {
-    approach: "CLI / Bash",
+    approach: "Command Line Interface",
     who: "OpenClaw, various agents",
     status: "Adopted",
     adopted: true,
@@ -13,7 +13,7 @@ const rows = [
     who: "Claude Code, Cursor",
     status: "Adopted",
     adopted: true,
-    color: "ai",
+    color: "media",
   },
   {
     approach: "Code Mode",
@@ -34,9 +34,9 @@ export function AdoptionSlide() {
         <div className="w-full rounded-lg border border-border-100 overflow-hidden">
           {/* Header */}
           <div className="grid grid-cols-3 gap-4 px-6 py-3 bg-background-200 border-b border-border-100">
-            <p className="text-xs font-medium text-foreground-200">APPROACH</p>
-            <p className="text-xs font-medium text-foreground-200">WHO'S DOING IT</p>
-            <p className="text-xs font-medium text-foreground-200 text-right">STATUS</p>
+            <p className="text-base font-medium text-foreground-200">APPROACH</p>
+            <p className="text-base font-medium text-foreground-200">WHO'S DOING IT</p>
+            <p className="text-base font-medium text-foreground-200 text-right">STATUS</p>
           </div>
           {/* Rows */}
           {rows.map((r) => (
@@ -44,13 +44,13 @@ export function AdoptionSlide() {
               key={r.approach}
               className="grid grid-cols-3 gap-4 px-6 py-4 border-b border-border-100 last:border-b-0"
             >
-              <p className={`text-sm font-medium text-${r.color}-100`}>{r.approach}</p>
-              <p className="text-sm text-foreground-200">{r.who}</p>
+              <p className={`text-base font-medium text-${r.color}-100`}>{r.approach}</p>
+              <p className="text-base text-foreground-200">{r.who}</p>
               <div className="text-right">
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-base font-medium ${
                     r.adopted
-                      ? "bg-ai-100/10 text-ai-100 border border-ai-100/30"
+                      ? "bg-compute-100/10 text-compute-100 border border-compute-100/30"
                       : "bg-accent-100/10 text-accent-100 border border-accent-100/30"
                   }`}
                 >

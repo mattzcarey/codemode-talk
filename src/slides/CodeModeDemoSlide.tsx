@@ -44,12 +44,12 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   const name = getToolName(toolPart)
 
   return (
-    <div className="rounded border border-border-100 bg-background-200 text-[12px] font-mono overflow-hidden mt-1">
+    <div className="rounded border border-border-100 bg-background-200 text-base font-mono overflow-hidden mt-1">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-2 py-1 hover:bg-ai-100/10 transition-colors"
+        className="w-full flex items-center gap-2 px-2 py-1 hover:bg-compute-100/10 transition-colors"
       >
-        <span className="text-ai-100">{expanded ? "▾" : "▸"}</span>
+        <span className="text-compute-100">{expanded ? "▾" : "▸"}</span>
         <span className="text-foreground-200">{name}</span>
         {fnCalls.length > 0 && (
           <span className="text-foreground-200/50 ml-1">
@@ -62,14 +62,14 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
           ) : isRunning ? (
             <span className="text-compute-100 animate-pulse">running...</span>
           ) : isDone ? (
-            <span className="text-ai-100">done</span>
+            <span className="text-compute-100">done</span>
           ) : (
             <span className="text-foreground-200/50">{toolPart.state ?? "pending"}</span>
           )}
         </span>
       </button>
       {expanded && (
-        <div className="border-t border-ai-100/20 p-2 space-y-1">
+        <div className="border-t border-compute-100/20 p-2 space-y-1">
           {toolPart.output?.code && (
             <pre className="text-foreground-200 whitespace-pre-wrap break-all">{toolPart.output.code}</pre>
           )}
@@ -139,29 +139,29 @@ export function CodeModeDemoSlide() {
 
   return (
     <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-3 w-full max-w-4xl h-full max-h-[80vh]">
+      <div className="flex flex-col items-center gap-8 w-full max-w-4xl h-full max-h-[80vh]">
         <div className="text-center shrink-0">
           <h2 className="text-foreground-100">
             <span className="text-accent-100">Code Mode</span> Demo
           </h2>
-          <p className="text-foreground-200 text-sm mt-1">
-            Live agent with PM tools — search + execute via Dynamic Worker Loaders
+          <p className="text-foreground-200 text-base mt-1">
+            Live agent with PM tools — search + execute via Dynamic Workers
           </p>
         </div>
 
         {/* Live chat */}
         <div className="w-full flex-1 min-h-0 rounded-lg border border-border-100 bg-background-200 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-100 shrink-0">
-            <div className={`size-2 rounded-full ${status === "error" ? "bg-accent-100" : "bg-ai-100"}`} />
-            <span className="text-xs font-medium text-foreground-100">Project Management Agent</span>
-            <span className="text-[12px] text-foreground-200 font-mono ml-auto">
+          <div className="flex items-center gap-2 px-5 py-2.5 border-b border-border-100 shrink-0">
+            <div className={`size-2 rounded-full ${status === "error" ? "bg-accent-100" : "bg-compute-100"}`} />
+            <span className="text-base font-medium text-foreground-100">Project Management Agent</span>
+            <span className="text-base text-foreground-200 font-mono ml-auto">
               code mode enabled
             </span>
             {messages.length > 0 && (
               <button
                 onClick={() => clearHistory()}
-                className="text-[12px] text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
+                className="text-base text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
               >
                 clear
               </button>
@@ -169,11 +169,28 @@ export function CodeModeDemoSlide() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-auto p-4 space-y-3">
+          <div className="flex-1 overflow-auto p-6 space-y-3">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-foreground-200/30">
-                <p className="text-sm">Ask anything about your projects</p>
-                <p className="text-xs mt-1">Try "Create a project called Demo" or "List all tasks"</p>
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <p className="text-base text-foreground-200/30">Try code mode</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[
+                    "Set up MCP Dev Summit with a sprint and 3 tasks",
+                    "Summarize all projects by task status",
+                    "Reassign all critical tasks to Matt",
+                  ].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => {
+                        setInput("")
+                        sendMessage({ role: "user", parts: [{ type: "text", text: q }] })
+                      }}
+                      className="text-base px-5 py-1.5 rounded-full border border-border-100 text-foreground-200 hover:border-accent-100/50 hover:text-foreground-100 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {messages.map((message) => {
@@ -187,8 +204,8 @@ export function CodeModeDemoSlide() {
 
                 return (
                   <div key={message.id} className="flex justify-end">
-                    <div className="rounded-lg px-3 py-2 max-w-[85%] bg-accent-100/10 border border-accent-100/30">
-                      <p className="text-xs text-foreground-100 whitespace-pre-wrap">{text}</p>
+                    <div className="rounded-lg px-4 py-2.5 max-w-[85%] bg-accent-100/10 border border-accent-100/30">
+                      <p className="text-base text-foreground-100 whitespace-pre-wrap">{text}</p>
                     </div>
                   </div>
                 )
@@ -200,8 +217,8 @@ export function CodeModeDemoSlide() {
                     if (part.type === "text" && part.text) {
                       return (
                         <div key={i} className="flex justify-start">
-                          <div className="rounded-lg px-3 py-2 max-w-[85%] bg-background-100 border border-border-100">
-                            <Streamdown className="sd-theme text-xs text-foreground-100" controls={false}>
+                          <div className="rounded-lg px-4 py-2.5 max-w-[85%] bg-background-100 border border-border-100">
+                            <Streamdown className="sd-theme text-base text-foreground-100" controls={false}>
                               {part.text}
                             </Streamdown>
                           </div>
@@ -224,7 +241,7 @@ export function CodeModeDemoSlide() {
             {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
               <div className="flex justify-start">
                 <div className="rounded-lg bg-background-100 border border-border-100 px-3 py-2">
-                  <span className="text-xs text-foreground-200/50 animate-pulse">thinking...</span>
+                  <span className="text-base text-foreground-200/50 animate-pulse">thinking...</span>
                 </div>
               </div>
             )}
@@ -246,13 +263,13 @@ export function CodeModeDemoSlide() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything about your projects..."
-                className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-sm text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-ai-100"
+                className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-base text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-compute-100"
               />
               {isStreaming ? (
                 <button
                   type="button"
                   onClick={() => stop()}
-                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-sm font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
+                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-base font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
                 >
                   Stop
                 </button>
@@ -260,7 +277,7 @@ export function CodeModeDemoSlide() {
                 <button
                   type="submit"
                   disabled={!input.trim()}
-                  className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
+                  className="rounded-lg bg-accent-100 px-4 py-2 text-base font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
                 >
                   Send
                 </button>
@@ -270,9 +287,9 @@ export function CodeModeDemoSlide() {
         </div>
 
         {/* Bottom note */}
-        <div className="flex gap-6 text-[13px] text-foreground-200 shrink-0">
+        <div className="flex gap-8 text-base text-foreground-200 shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-ai-100">2 tools</span> — search + execute
+            <span className="text-compute-100">2 tools</span> — search + execute
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-compute-100">20 endpoints</span> — projects, tasks, sprints, comments

@@ -5,16 +5,19 @@ export function TitleSlide() {
     <SlideContainer>
       <div className="flex w-full max-w-5xl flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-16">
         {/* Text content */}
-        <div className="flex flex-col gap-4 text-center md:text-left">
-          <h1 className="text-foreground-100">
-            Every API is a Tool for Agents{" "}
-            <span className="text-accent-100">with Code Mode</span>
+        <div className="flex flex-col gap-8 text-center md:text-left">
+          <h1 className="text-foreground-100 md:text-[5rem] md:leading-[105%]">
+            Every API is a<br />
+            Tool for <span className="text-accent-100">Agents</span>
           </h1>
 
-          <div className="mt-6 flex flex-col gap-2">
+          <div className="mt-8 flex flex-col gap-3">
             <h3 className="text-foreground-100">Matt Carey</h3>
             <p className="text-foreground-200">
               Agents & MCP at Cloudflare
+            </p>
+            <p className="text-foreground-200">
+              MCP TS SDK Maintainer
             </p>
             <a
               href="https://twitter.com/mattzcarey"
@@ -26,14 +29,14 @@ export function TitleSlide() {
             </a>
           </div>
 
-          <p className="mt-2 font-mono text-sm text-foreground-200">
-            Node Congress
+          <p className="mt-3 font-mono text-base text-foreground-200">
+            MCP Dev Summit
           </p>
         </div>
 
         {/* Photo */}
         <div className="flex-shrink-0">
-          <div className="relative size-48 overflow-hidden rounded-2xl border-2 border-border-100 bg-background-200 md:size-64">
+          <div className="relative size-56 overflow-hidden rounded-2xl border-2 border-border-100 bg-background-200 md:size-80">
             <img
               src="/photo.jpg"
               alt="Matt Carey"

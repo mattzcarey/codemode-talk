@@ -6,7 +6,7 @@ export function ThankYouSlide() {
       <div className="flex flex-col items-center gap-8 text-center">
         <h1 className="text-foreground-100">Thank you!</h1>
 
-        <div className="flex flex-col gap-4 mt-4">
+        <div className="flex flex-col gap-8 mt-4">
           {/* Try it */}
           <div className="rounded-lg border border-compute-100 bg-compute-100/10 px-8 py-4">
             <p className="text-foreground-100">
@@ -25,10 +25,10 @@ export function ThankYouSlide() {
           </div>
 
           {/* Hiring */}
-          <div className="rounded-lg border border-ai-100 bg-ai-100/10 px-8 py-4">
+          <div className="rounded-lg border border-compute-100 bg-compute-100/10 px-8 py-4">
             <p className="text-foreground-100">
-              <span className="font-mono text-ai-100">PS:</span>{" "}
-              we're hiring <span className="text-ai-100 font-medium">!!</span>
+              <span className="font-mono text-compute-100">PS:</span>{" "}
+              we're hiring <span className="text-compute-100 font-medium">!!</span>
             </p>
           </div>
         </div>
@@ -44,7 +44,7 @@ export function ThankYouSlide() {
         </a>
 
         {/* Cloudflare logo */}
-        <div className="mt-2 flex items-center gap-3 text-accent-100">
+        <div className="mt-2 flex items-center gap-8 text-accent-100">
           <svg
             width="66"
             height="30"

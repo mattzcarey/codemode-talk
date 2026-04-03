@@ -23,7 +23,8 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
   const isComplete = toolPart.state === "output-available"
   const isRunning = !isComplete && !hasError
 
-  const rawName = toolPart.toolName || ""
+  // Static tool parts: type is "tool-{name}", dynamic: toolName field
+  const rawName = toolPart.toolName || (toolPart.type.startsWith("tool-") ? toolPart.type.slice(5) : "") || ""
   const toolNameMatch = rawName.match(/^tool_[a-zA-Z0-9]+_(.+)$/)
   const label = toolNameMatch ? toolNameMatch[1] : rawName || "tool"
 
@@ -35,10 +36,10 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
     : undefined
 
   return (
-    <div className={`rounded border overflow-hidden mt-1 ${hasError ? "border-accent-100/40" : "border-compute-100/30 bg-compute-100/5"}`}>
+    <div className={`rounded border overflow-hidden mt-3 ${hasError ? "border-accent-100/40" : "border-compute-100/30 bg-compute-100/5"}`}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2 px-2 py-1 text-[12px] font-mono hover:bg-compute-100/10 transition-colors"
+        className="w-full flex items-center gap-2 px-2 py-1 text-base font-mono hover:bg-compute-100/10 transition-colors"
       >
         <span className="text-compute-100">{expanded ? "▾" : "▸"}</span>
         <span className="text-foreground-200">{label}</span>
@@ -53,7 +54,7 @@ function ToolCard({ toolPart }: { toolPart: ToolPart }) {
         </span>
       </button>
       {expanded && (
-        <div className="border-t border-compute-100/20 p-2 space-y-1 text-[12px] font-mono">
+        <div className="border-t border-compute-100/20 p-2 space-y-1 text-base font-mono">
           {inputStr && (
             <pre className="text-foreground-200 whitespace-pre-wrap break-all max-h-32 overflow-auto">{inputStr}</pre>
           )}
@@ -177,55 +178,55 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
   const hasPending = pendingMessageRef.current !== null
 
   return (
-    <div className="flex flex-col items-center gap-3 w-full max-w-4xl h-full max-h-[80vh]">
+    <div className="flex flex-col items-center gap-8 w-full max-w-4xl h-full max-h-[80vh]">
       <div className="text-center shrink-0">
         <h2 className="text-foreground-100">
           <span className="text-accent-100">Cloudflare</span> MCP
         </h2>
-        <p className="text-foreground-200 text-sm mt-1">
+        <p className="text-foreground-200 text-base mt-1">
           Real Cloudflare API via remote MCP server
         </p>
       </div>
 
       <div className="w-full flex-1 min-h-0 rounded-lg border border-border-100 bg-background-200 overflow-hidden flex flex-col">
         {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-100 shrink-0">
+          <div className="flex items-center gap-2 px-5 py-2.5 border-b border-border-100 shrink-0">
             <div className={`size-2 rounded-full ${
-              isReady ? "bg-ai-100" : isConnecting || hasPending ? "bg-media-100" : connectError ? "bg-accent-100" : "bg-foreground-200/30"
+              isReady ? "bg-compute-100" : isConnecting || hasPending ? "bg-media-100" : connectError ? "bg-accent-100" : "bg-foreground-200/30"
             }`} />
-            <span className="text-xs font-medium text-foreground-100">cloudflare</span>
+            <span className="text-base font-medium text-foreground-100">cloudflare</span>
             {isAuthenticating && (
-              <span className="text-[12px] text-media-100 animate-pulse">waiting for auth...</span>
+              <span className="text-base text-media-100 animate-pulse">waiting for auth...</span>
             )}
             {isConnecting && !isAuthenticating && (
-              <span className="text-[12px] text-foreground-200 animate-pulse">connecting...</span>
+              <span className="text-base text-foreground-200 animate-pulse">connecting...</span>
             )}
             {isReady && toolCount > 0 && (
-              <span className="text-[12px] text-foreground-200">{toolCount} tools</span>
+              <span className="text-base text-foreground-200">{toolCount} tools</span>
             )}
             {connectError && (
-              <span className="text-[12px] text-accent-100">connection failed</span>
+              <span className="text-base text-accent-100">connection failed</span>
             )}
-            <span className="text-[12px] text-media-100 font-mono ml-auto">MCP client</span>
+            <span className="text-base text-media-100 font-mono ml-auto">MCP client</span>
             <button
               onClick={onReset}
-              className="text-[12px] text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
+              className="text-base text-foreground-200/50 hover:text-accent-100 transition-colors font-mono"
             >
               reset
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-auto p-4 space-y-3">
+          <div className="flex-1 overflow-auto p-6 space-y-3">
             {messages.length === 0 && !hasPending && (
               <div className="flex flex-col items-center justify-center h-full gap-3">
-                <p className="text-sm text-foreground-200/30">Try the Cloudflare MCP server</p>
+                <p className="text-base text-foreground-200/30">Try the Cloudflare MCP server</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {["What's the traffic today?", "List my Workers", "Create a hello world Worker"].map((q) => (
                     <button
                       key={q}
                       onClick={() => setInput(q)}
-                      className="text-[12px] px-3 py-1.5 rounded-full border border-border-100 text-foreground-200 hover:border-accent-100/50 hover:text-foreground-100 transition-colors"
+                      className="text-base px-5 py-1.5 rounded-full border border-border-100 text-foreground-200 hover:border-accent-100/50 hover:text-foreground-100 transition-colors"
                     >
                       {q}
                     </button>
@@ -237,12 +238,12 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
             {hasPending && messages.length === 0 && (
               <>
                 <div className="flex justify-end">
-                  <div className="rounded-lg px-3 py-2 max-w-[85%] bg-accent-100/10 border border-accent-100/30 opacity-60">
-                    <p className="text-xs text-foreground-100">{pendingMessageRef.current}</p>
+                  <div className="rounded-lg px-4 py-2.5 max-w-[85%] bg-accent-100/10 border border-accent-100/30 opacity-60">
+                    <p className="text-base text-foreground-100">{pendingMessageRef.current}</p>
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <span className="text-xs text-foreground-200/50 animate-pulse">
+                  <span className="text-base text-foreground-200/50 animate-pulse">
                     {isAuthenticating ? "Waiting for authentication..." : "Connecting to mcp.cloudflare.com..."}
                   </span>
                 </div>
@@ -260,8 +261,8 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
 
                 return (
                   <div key={message.id} className="flex justify-end">
-                    <div className="rounded-lg px-3 py-2 max-w-[85%] bg-accent-100/10 border border-accent-100/30">
-                      <p className="text-xs text-foreground-100 whitespace-pre-wrap">{text}</p>
+                    <div className="rounded-lg px-4 py-2.5 max-w-[85%] bg-accent-100/10 border border-accent-100/30">
+                      <p className="text-base text-foreground-100 whitespace-pre-wrap">{text}</p>
                     </div>
                   </div>
                 )
@@ -273,8 +274,8 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
                     if (part.type === "text" && part.text) {
                       return (
                         <div key={i} className="flex justify-start">
-                          <div className="rounded-lg px-3 py-2 max-w-[85%] bg-background-100 border border-border-100">
-                            <Streamdown className="sd-theme text-xs text-foreground-100" controls={false}>
+                          <div className="rounded-lg px-4 py-2.5 max-w-[85%] bg-background-100 border border-border-100">
+                            <Streamdown className="sd-theme text-base text-foreground-100" controls={false}>
                               {part.text}
                             </Streamdown>
                           </div>
@@ -298,7 +299,7 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
             {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
               <div className="flex justify-start">
                 <div className="rounded-lg bg-background-100 border border-border-100 px-3 py-2">
-                  <span className="text-xs text-foreground-200/50 animate-pulse">thinking...</span>
+                  <span className="text-base text-foreground-200/50 animate-pulse">thinking...</span>
                 </div>
               </div>
             )}
@@ -318,13 +319,13 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
                 onKeyDown={handleKeyDown}
                 placeholder="Ask Cloudflare anything..."
                 disabled={hasPending}
-                className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-sm text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-ai-100 disabled:opacity-50"
+                className="flex-1 rounded-lg border border-border-100 bg-background-100 px-3 py-2 text-base text-foreground-100 placeholder:text-foreground-200/50 focus:outline-none focus:border-compute-100 disabled:opacity-50"
               />
               {isStreaming ? (
                 <button
                   type="button"
                   onClick={() => stop()}
-                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-sm font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
+                  className="rounded-lg bg-accent-100/20 px-4 py-2 text-base font-medium text-accent-100 hover:bg-accent-100/30 transition-colors"
                 >
                   Stop
                 </button>
@@ -332,7 +333,7 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
                 <button
                   type="submit"
                   disabled={!input.trim() || hasPending}
-                  className="rounded-lg bg-accent-100 px-4 py-2 text-sm font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
+                  className="rounded-lg bg-accent-100 px-4 py-2 text-base font-medium text-white hover:bg-accent-100/90 disabled:opacity-40 transition-colors"
                 >
                   Send
                 </button>
@@ -342,9 +343,9 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
         </div>
 
       {/* Bottom note */}
-      <div className="flex gap-6 text-[13px] text-foreground-200 shrink-0">
+      <div className="flex gap-8 text-base text-foreground-200 shrink-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-ai-100">mcp.cloudflare.com/mcp</span>
+          <span className="text-compute-100">mcp.cloudflare.com/mcp</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-media-100">OAuth</span> · MCP client

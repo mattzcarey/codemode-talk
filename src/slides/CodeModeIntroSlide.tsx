@@ -8,7 +8,7 @@ export function CodeModeIntroSlide() {
           <h2 className="text-foreground-100">
             <span className="text-accent-100">Code Mode</span>
           </h2>
-          <p className="text-foreground-200 text-sm mt-1">
+          <p className="text-foreground-200 text-base mt-1">
             Instead of calling tools one-by-one, the LLM writes code against a typed SDK
           </p>
         </div>
@@ -19,7 +19,7 @@ export function CodeModeIntroSlide() {
           className="w-full max-w-2xl rounded-lg border border-border-100"
         />
 
-        <p className="text-sm text-foreground-200 text-center max-w-2xl">
+        <p className="text-base text-foreground-200 text-center max-w-2xl">
           The agent executes LLM-generated code in a <span className="text-compute-100 font-medium">sandboxed V8 isolate</span>,
           dispatching tool calls via RPC back to the host
         </p>

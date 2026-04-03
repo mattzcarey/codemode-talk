@@ -15,7 +15,7 @@ const benefits = [
   {
     title: "Agent stays simple",
     description: "No complex tool orchestration. The agent just writes code. All the hard stuff runs server-side.",
-    color: "ai",
+    color: "media",
     icon: (
       <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
@@ -35,7 +35,7 @@ const benefits = [
 ]
 
 const flowItems = [
-  { label: "Agent", sub: "writes code", color: "ai" },
+  { label: "Agent", sub: "writes code", color: "compute" },
   { label: "MCP Server", sub: "search + execute", color: "accent" },
   { label: "V8 Isolate", sub: "runs code", color: "compute" },
   { label: "Tools", sub: "via RPC", color: "media" },
@@ -60,12 +60,12 @@ function Arrow({ delay }: { delay: number }) {
 export function BackToMCPSlide() {
   return (
     <SlideContainer>
-      <div className="flex flex-col items-center gap-6 max-w-3xl">
+      <div className="flex flex-col items-center gap-8 max-w-3xl">
         <div className="text-center">
           <h2 className="text-foreground-100">
             Back to <span className="text-accent-100">MCP</span>
           </h2>
-          <p className="text-foreground-200 text-sm mt-1">
+          <p className="text-foreground-200 text-base mt-1">
             Code mode completes the picture
           </p>
         </div>
@@ -75,13 +75,13 @@ export function BackToMCPSlide() {
           {flowItems.map((item, i) => (
             <span key={item.label} className="contents">
               <motion.div
-                className={`rounded-lg border border-${item.color}-100/40 bg-${item.color}-100/5 px-4 py-3 text-center`}
+                className={`rounded-lg border border-${item.color}-100/40 bg-${item.color}-100/5 px-5 py-4 text-center`}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 + i * 0.2, ease: "easeOut" }}
               >
-                <p className={`text-xs font-medium text-${item.color}-100`}>{item.label}</p>
-                <p className="text-[12px] text-foreground-200 mt-0.5">{item.sub}</p>
+                <p className={`text-base font-medium text-${item.color}-100`}>{item.label}</p>
+                <p className="text-base text-foreground-200 mt-0.5">{item.sub}</p>
               </motion.div>
               {i < flowItems.length - 1 && <Arrow delay={0.3 + i * 0.2} />}
             </span>
@@ -93,15 +93,15 @@ export function BackToMCPSlide() {
           {benefits.map((b, i) => (
             <motion.div
               key={b.title}
-              className={`rounded-lg border border-${b.color}-100/40 bg-${b.color}-100/5 p-4 flex items-start gap-3`}
+              className={`rounded-lg border border-${b.color}-100/40 bg-${b.color}-100/5 p-6 flex items-start gap-3`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 1.0 + i * 0.15, ease: "easeOut" }}
             >
               <div className={`text-${b.color}-100 shrink-0 mt-0.5`}>{b.icon}</div>
               <div>
-                <p className={`text-sm font-medium text-${b.color}-100`}>{b.title}</p>
-                <p className="text-xs text-foreground-200 mt-0.5">{b.description}</p>
+                <p className={`text-base font-medium text-${b.color}-100`}>{b.title}</p>
+                <p className="text-base text-foreground-200 mt-0.5">{b.description}</p>
               </div>
             </motion.div>
           ))}
@@ -114,7 +114,7 @@ export function BackToMCPSlide() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
         >
-          <p className="text-sm text-foreground-100 text-center">
+          <p className="text-base text-foreground-100 text-center">
             The agent is just a code writer. All the hard stuff runs on the server.
           </p>
         </motion.div>

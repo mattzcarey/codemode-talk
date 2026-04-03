@@ -1,9 +1,9 @@
 # Codemode Talk — Slide Deck
 
 ## Talk
-**"Every API is a Tool for Agents with Code Mode"**
+**"Every API is a Tool for Agents"**
 Speaker: Matt Carey (@mattzcarey), Agents & MCP at Cloudflare
-Event: Node Congress
+Event: MCP Dev Summit
 
 ## Project Structure
 - `src/slides/` — One component per slide

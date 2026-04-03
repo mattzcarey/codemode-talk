@@ -14,7 +14,7 @@ function Box({
 }) {
   const variants = {
     default: "border-border-100 bg-background-200",
-    ai: "border-ai-100/40 bg-ai-100/5",
+    ai: "border-compute-100/40 bg-compute-100/5",
     compute: "border-compute-100 bg-compute-100/10",
     accent: "border-accent-100 bg-accent-100/10",
     muted: "border-border-100/50 bg-background-100/50",
@@ -24,7 +24,7 @@ function Box({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: "easeOut" }}
-      className={`rounded-lg border px-4 py-3 ${variants[variant]} ${className}`}
+      className={`rounded-lg border px-6 py-4 ${variants[variant]} ${className}`}
     >
       {children}
     </motion.div>
@@ -50,19 +50,19 @@ function Arrow({ delay = 0 }: { delay?: number }) {
 export function ToolCallingSlide() {
   return (
     <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-2 scale-[0.9] md:scale-100 origin-top">
-        <h2 className="text-center text-foreground-100 mb-1">
-          Giving Agents Hands
+      <div className="flex flex-col items-center gap-8 scale-[0.9] md:scale-100 origin-top">
+        <h2 className="text-center text-foreground-100 mb-2">
+          Giving Agents <span className="text-accent-100">Hands</span>
         </h2>
-        <p className="text-center text-foreground-200 text-sm mb-6">
+        <p className="text-center text-foreground-200 text-base mb-8">
           Tool / Function Calling
         </p>
 
         <div className="flex flex-col items-center w-[500px]">
           {/* User */}
           <Box variant="accent" className="w-full text-center" delay={0.1}>
-            <p className="text-sm font-medium text-accent-100">USER</p>
-            <p className="text-xs text-foreground-200 italic mt-1">
+            <p className="text-base font-medium text-accent-100">USER</p>
+            <p className="text-base text-foreground-200 italic mt-2">
               "What's the weather in London?"
             </p>
           </Box>
@@ -71,8 +71,8 @@ export function ToolCallingSlide() {
 
           {/* LLM decides */}
           <Box variant="ai" className="w-full text-center" delay={0.5}>
-            <p className="text-sm font-medium text-ai-100">LLM</p>
-            <p className="text-xs text-foreground-100 mt-1">
+            <p className="text-base font-medium text-compute-100">LLM</p>
+            <p className="text-base text-foreground-100 mt-2">
               Decides to call a tool
             </p>
           </Box>
@@ -81,8 +81,8 @@ export function ToolCallingSlide() {
 
           {/* Tool call */}
           <Box variant="compute" className="w-full" delay={0.9}>
-            <p className="text-sm font-medium text-compute-100 text-center">TOOL CALL</p>
-            <div className="mt-2 rounded border border-compute-100/30 bg-compute-100/5 px-3 py-2 font-mono text-xs">
+            <p className="text-base font-medium text-compute-100 text-center">TOOL CALL</p>
+            <div className="mt-3 rounded border border-compute-100/30 bg-compute-100/5 px-5 py-4 font-mono text-sm">
               <span className="text-compute-100">get_weather</span>
               <span className="text-foreground-200">{"({ "}</span>
               <span className="text-accent-100">city</span>
@@ -94,8 +94,8 @@ export function ToolCallingSlide() {
 
           {/* Result */}
           <Box variant="muted" className="w-full" delay={1.3}>
-            <p className="text-sm font-medium text-foreground-200 text-center">RESULT</p>
-            <div className="mt-2 rounded border border-border-100/30 bg-background-200 px-3 py-2 font-mono text-xs text-foreground-200">
+            <p className="text-base font-medium text-foreground-200 text-center">RESULT</p>
+            <div className="mt-3 rounded border border-border-100/30 bg-background-200 px-5 py-4 font-mono text-base text-foreground-200">
               {'{ temp: 18, condition: "cloudy" }'}
             </div>
           </Box>
@@ -104,8 +104,8 @@ export function ToolCallingSlide() {
 
           {/* LLM responds */}
           <Box variant="ai" className="w-full text-center" delay={1.7}>
-            <p className="text-sm font-medium text-ai-100">LLM RESPONSE</p>
-            <p className="text-xs text-foreground-100 italic mt-1">
+            <p className="text-base font-medium text-compute-100">LLM RESPONSE</p>
+            <p className="text-base text-foreground-100 italic mt-2">
               "It's 18°C and cloudy in London"
             </p>
           </Box>

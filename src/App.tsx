@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
-import { useNavigate, useParams } from "react-router"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { AnimatePresence } from "framer-motion"
 import {
   TitleSlide,
@@ -11,15 +10,12 @@ import {
   ExampleIntroSlide,
   CLISlide,
   ToolSearchSlide,
-  CodeModeIntroSlide,
   CodeModeSDKSlide,
-  CodeModeExecuteSlide,
-  WhyComposableSlide,
-  WhyTokensSlide,
   BackToMCPSlide,
   UntrustedCodeSlide,
   WorkerLoadersSlide,
   CodeModeDemoSlide,
+  SplitServersSlide,
   CloudflareAPIDemoSlide,
   FindOutMoreSlide,
   ThankYouSlide,
@@ -31,15 +27,15 @@ export const slides = [
   { component: ToolCallingSlide, slug: "tool-calling" },
   { component: MCPSlide, slug: "mcp" },
   { component: ContextWindowSlide, slug: "context-window" },
+  { component: SplitServersSlide, slug: "split-servers" },
   { component: ProgressiveDisclosureSlide, slug: "progressive-disclosure" },
   { component: ExampleIntroSlide, slug: "pm-api" },
+  { component: () => <ProgressiveDisclosureSlide highlight={0} />, slug: "pd-cli" },
   { component: CLISlide, slug: "cli" },
+  { component: () => <ProgressiveDisclosureSlide highlight={1} />, slug: "pd-search" },
   { component: ToolSearchSlide, slug: "tool-search" },
-  { component: CodeModeIntroSlide, slug: "code-mode-intro" },
+  { component: () => <ProgressiveDisclosureSlide highlight={2} />, slug: "pd-codemode" },
   { component: CodeModeSDKSlide, slug: "code-mode-sdk" },
-  { component: CodeModeExecuteSlide, slug: "code-mode-execute" },
-  { component: WhyComposableSlide, slug: "why-composable" },
-  { component: WhyTokensSlide, slug: "why-tokens" },
   { component: UntrustedCodeSlide, slug: "untrusted-code" },
   { component: WorkerLoadersSlide, slug: "worker-loaders" },
   { component: CodeModeDemoSlide, slug: "code-mode-demo" },
@@ -51,20 +47,53 @@ export const slides = [
 
 const slugToIndex = new Map(slides.map((s, i) => [s.slug, i]))
 
+function getInitialSlide() {
+  const path = window.location.pathname.replace(/^\//, "")
+  return slugToIndex.get(path) ?? 0
+}
+
 export default function App() {
-  const navigate = useNavigate()
-  const { slug } = useParams()
+  const [currentSlide, setCurrentSlide] = useState(getInitialSlide)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const currentSlide = slug ? (slugToIndex.get(slug) ?? 0) : 0
+  // 20-minute talk timer
+  const TIMER_DURATION = 20 * 60
+  const [timerStart, setTimerStart] = useState<number | null>(null)
+  const [elapsed, setElapsed] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    if (currentSlide === 0) {
+      setTimerStart(null)
+      setElapsed(0)
+      if (timerRef.current) clearInterval(timerRef.current)
+      timerRef.current = null
+    } else if (timerStart === null) {
+      setTimerStart(Date.now())
+    }
+  }, [currentSlide, timerStart])
+
+  useEffect(() => {
+    if (timerStart === null) return
+    timerRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - timerStart) / 1000))
+    }, 1000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [timerStart])
+
+  const remaining = TIMER_DURATION - elapsed
+  const timerMinutes = Math.max(0, Math.floor(Math.abs(remaining) / 60))
+  const timerSeconds = Math.max(0, Math.abs(remaining) % 60)
+  const isOvertime = remaining < 0
 
   const goToSlide = useCallback(
     (index: number) => {
       if (index >= 0 && index < slides.length) {
-        navigate(`/${slides[index].slug}`)
+        setCurrentSlide(index)
+        window.history.replaceState(null, "", `/${slides[index].slug}`)
       }
     },
-    [navigate]
+    []
   )
 
   const nextSlide = useCallback(() => {
@@ -74,6 +103,17 @@ export default function App() {
   const prevSlide = useCallback(() => {
     goToSlide(Math.max(currentSlide - 1, 0))
   }, [currentSlide, goToSlide])
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = () => {
+      const path = window.location.pathname.replace(/^\//, "")
+      const idx = slugToIndex.get(path) ?? 0
+      setCurrentSlide(idx)
+    }
+    window.addEventListener("popstate", onPopState)
+    return () => window.removeEventListener("popstate", onPopState)
+  }, [])
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -129,16 +169,25 @@ export default function App() {
 
   return (
     <div className="relative flex h-screen w-screen flex-col bg-background-100">
-      {/* Slide area — border stops above the nav strip */}
+      {/* Slide area */}
       <div className="flex-1 min-h-0 p-6 pb-3 md:p-12 md:pb-3">
         <AnimatePresence mode="wait">
           <CurrentSlideComponent key={currentSlide} />
         </AnimatePresence>
       </div>
 
-      {/* Nav strip below the slide border */}
+      {/* Nav strip */}
       <div className="relative flex shrink-0 items-center justify-center px-6 pt-2 pb-4 md:px-12">
-        {/* Navigation dots — centered */}
+        {/* Timer — bottom left */}
+        {timerStart !== null && (
+          <div className="absolute left-6 md:left-12 flex items-center gap-1.5">
+            <span className={`font-mono text-sm tabular-nums ${isOvertime ? "text-accent-100" : remaining <= 120 ? "text-accent-100/80" : "text-foreground-200/60"}`}>
+              {isOvertime ? "-" : ""}{String(timerMinutes).padStart(2, "0")}:{String(timerSeconds).padStart(2, "0")}
+            </span>
+          </div>
+        )}
+
+        {/* Navigation dots */}
         <div className="flex items-center gap-2">
           {slides.map((_, index) => (
             <button
@@ -154,7 +203,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* Arrows + counter + fullscreen — right */}
+        {/* Arrows + counter + fullscreen */}
         <div className="absolute right-6 md:right-12 flex items-center gap-3">
           <button
             onClick={prevSlide}

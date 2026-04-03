@@ -139,9 +139,10 @@ export default {
     // Execute raw code in a V8 isolate (worker-loaders slide)
     if (url.pathname === "/api/execute" && request.method === "POST") {
       try {
-        const { code, globalOutbound } = (await request.json()) as {
+        const { code, globalOutbound, nodeCompat } = (await request.json()) as {
           code: string;
           globalOutbound?: string | null;
+          nodeCompat?: boolean;
         };
         const allowOutbound = globalOutbound === "default";
 
@@ -170,7 +171,7 @@ export default {
 
         const config: Record<string, unknown> = {
           compatibilityDate: "2025-06-01",
-          compatibilityFlags: ["nodejs_compat"],
+          compatibilityFlags: nodeCompat !== false ? ["nodejs_compat"] : [],
           mainModule: "executor.js",
           modules: { "executor.js": module },
         };

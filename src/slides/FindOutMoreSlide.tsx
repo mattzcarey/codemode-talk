@@ -19,7 +19,7 @@ export function FindOutMoreSlide() {
           />
         </a>
 
-        <p className="font-mono text-sm text-foreground-200">
+        <p className="font-mono text-base text-foreground-200">
           blog.cloudflare.com/code-mode-mcp
         </p>
       </div>

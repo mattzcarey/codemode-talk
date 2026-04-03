@@ -1,4 +1,6 @@
 import { SlideContainer } from "@/components"
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 
 const groups = [
   {
@@ -44,7 +46,7 @@ const groups = [
 ]
 
 const methodColor: Record<string, string> = {
-  GET: "text-ai-100",
+  GET: "text-compute-100",
   POST: "text-compute-100",
   PATCH: "text-media-100",
   DELETE: "text-accent-100",
@@ -53,45 +55,90 @@ const methodColor: Record<string, string> = {
 const total = groups.reduce((n, g) => n + g.endpoints.length, 0)
 
 export function ExampleIntroSlide() {
-  return (
-    <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-5 max-w-5xl w-full">
-        <div className="text-center">
-          <h2 className="text-foreground-100">
-            Let's build a <span className="text-accent-100">Project Management</span> API
-          </h2>
-          <p className="text-foreground-200 text-sm mt-1">
-            {total} REST endpoints · Cloudflare Worker + D1
-          </p>
-        </div>
+  const [revealed, setRevealed] = useState(false)
 
-        {/* Grouped endpoints */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
-          {groups.map((g) => (
-            <div key={g.label} className="flex flex-col gap-1">
-              <p className="text-[12px] font-medium text-foreground-200/60 px-1 uppercase tracking-wide">
-                {g.label}
-              </p>
-              {g.endpoints.map((e) => (
-                <div
-                  key={e.method + e.path}
-                  className="rounded border border-border-100 bg-background-200 px-2.5 py-1.5"
-                >
-                  <p className="text-[12px] font-mono">
-                    <span className={methodColor[e.method]}>{e.method.padEnd(6)}</span>{" "}
-                    <span className="text-foreground-200">{e.path}</span>
+  return (
+    <SlideContainer showDots={!revealed}>
+      <AnimatePresence mode="wait">
+        {!revealed ? (
+          <motion.div
+            key="intro"
+            className="flex flex-col items-center gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="text-foreground-100">
+              Example Time
+            </h2>
+            <p className="text-foreground-200 text-lg max-w-lg text-center">
+              We have a <span className="text-accent-100 font-medium">Project Management API</span>.{" "}
+              Projects, sprints, tasks, comments — the usual stuff.
+            </p>
+            <p className="text-foreground-200 text-lg max-w-lg text-center">
+              How do we give an agent access to <span className="text-accent-100 font-medium">{total} endpoints</span>?
+            </p>
+            <button
+              onClick={() => setRevealed(true)}
+              className="rounded-lg border border-accent-100/40 bg-accent-100/10 px-6 py-3 text-base font-medium text-accent-100 hover:bg-accent-100/20 transition-colors"
+            >
+              show the API →
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="api"
+            className="flex flex-col items-center gap-5 w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex items-center justify-between w-full">
+              <div>
+                <h2 className="text-foreground-100">
+                  <span className="text-accent-100">Project Management</span> API
+                </h2>
+                <p className="text-foreground-200 text-base mt-1">
+                  {total} REST endpoints · Cloudflare Worker + D1
+                </p>
+              </div>
+              <button
+                onClick={() => setRevealed(false)}
+                className="shrink-0 px-5 py-1.5 rounded border border-border-100 bg-background-200 text-foreground-200 hover:text-foreground-100 text-base font-mono transition-colors"
+              >
+                ← back
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+              {groups.map((g) => (
+                <div key={g.label} className="flex flex-col gap-1.5">
+                  <p className="text-base font-medium text-foreground-200/60 px-1 uppercase tracking-wide">
+                    {g.label}
                   </p>
-                  <p className="text-[9px] text-foreground-200/50">{e.desc}</p>
+                  {g.endpoints.map((e) => (
+                    <div
+                      key={e.method + e.path}
+                      className="rounded border border-border-100 bg-background-200 px-3 py-2"
+                    >
+                      <p className="text-base font-mono leading-snug">
+                        <span className={methodColor[e.method]}>{e.method}</span>{" "}
+                        <span className="text-foreground-200">{e.path}</span>
+                      </p>
+                      <p className="text-sm text-foreground-200/50">{e.desc}</p>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-          ))}
-        </div>
 
-        <p className="text-sm text-foreground-200 text-center max-w-lg">
-          How do we expose {total} endpoints to an LLM without blowing up the context window?
-        </p>
-      </div>
+            <p className="text-base text-foreground-200 text-center max-w-lg">
+              How do we expose {total} endpoints to an LLM without blowing up the context window?
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </SlideContainer>
   )
 }

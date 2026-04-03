@@ -18,7 +18,7 @@ const templates = [
     label: "Create Project",
     code: `async () => {
   const project = await codemode.createProject({
-    name: "Node Congress Demo",
+    name: "MCP Dev Summit",
     description: "Created live on stage"
   });
   console.log("Created:", project.name);
@@ -141,24 +141,24 @@ export function CodeModeExecuteSlide() {
 
   return (
     <SlideContainer showDots={false}>
-      <div className="flex flex-col items-center gap-3 w-full max-w-5xl">
+      <div className="flex flex-col items-center gap-8 w-full max-w-5xl">
         <div className="text-center">
           <h2 className="text-foreground-100">
-            <span className="text-accent-100">Code Mode</span>: Execute
+            <span className="text-accent-100">Code Mode:</span> Execute
           </h2>
-          <p className="text-foreground-200 text-sm mt-1">
+          <p className="text-foreground-200 text-base mt-1">
             Code runs in a V8 isolate — not on the agent
           </p>
         </div>
 
         {/* Template selector */}
         <div className="flex items-center gap-2 w-full">
-          <span className="text-xs text-foreground-200">Templates:</span>
+          <span className="text-base text-foreground-200">Templates:</span>
           {templates.map((t) => (
             <button
               key={t.label}
               onClick={() => { setCode(t.code); setOutput(null); setLogs([]) }}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+              className={`px-2.5 py-1 rounded text-base font-mono transition-colors ${
                 code === t.code
                   ? "bg-accent-100/20 text-accent-100 border border-accent-100/40"
                   : "bg-background-200 text-foreground-200 border border-border-100 hover:text-foreground-100"
@@ -169,17 +169,17 @@ export function CodeModeExecuteSlide() {
           ))}
         </div>
 
-        <div className="flex gap-4 w-full flex-1 min-h-0">
+        <div className="flex gap-8 w-full flex-1 min-h-0">
           {/* Left: Code editor */}
           <div className="flex-1 flex flex-col gap-2 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="text-[12px] font-mono text-foreground-200">
+              <span className="text-base font-mono text-foreground-200">
                 codemode.execute()
               </span>
               <button
                 onClick={run}
                 disabled={running}
-                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-colors ${
+                className={`rounded-lg px-5 py-1.5 text-base font-medium transition-colors ${
                   running
                     ? "bg-compute-100/20 text-compute-100/50 cursor-wait"
                     : "bg-compute-100 text-white hover:bg-compute-100/90"
@@ -192,22 +192,22 @@ export function CodeModeExecuteSlide() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               spellCheck={false}
-              className="flex-1 rounded-lg border border-accent-100/40 bg-background-200 p-3 text-[13px] font-mono text-foreground-100 leading-relaxed resize-none focus:outline-none focus:border-accent-100 min-h-[35vh]"
+              className="flex-1 rounded-lg border border-accent-100/40 bg-background-200 p-6 text-base font-mono text-foreground-100 leading-relaxed resize-none focus:outline-none focus:border-accent-100 min-h-[35vh]"
             />
           </div>
 
           {/* Right: Execution log + output */}
           <div className="w-72 shrink-0 flex flex-col gap-2">
             {/* Execution log */}
-            <span className="text-[12px] font-mono text-foreground-200">
+            <span className="text-base font-mono text-foreground-200">
               Execution Log
             </span>
             <div
               ref={logRef}
-              className="rounded-lg border border-border-100 bg-background-200 p-3 overflow-auto min-h-[10vh] max-h-[18vh]"
+              className="rounded-lg border border-border-100 bg-background-200 p-6 overflow-auto min-h-[10vh] max-h-[18vh]"
             >
               {logs.length === 0 ? (
-                <p className="text-[12px] text-foreground-200/30 text-center py-4">
+                <p className="text-base text-foreground-200/30 text-center py-4">
                   Click Run to execute
                 </p>
               ) : (
@@ -215,11 +215,11 @@ export function CodeModeExecuteSlide() {
                   {logs.map((log, i) => (
                     <div key={i} className="flex items-start gap-1.5">
                       <span
-                        className={`text-[12px] font-mono shrink-0 ${
+                        className={`text-base font-mono shrink-0 ${
                           log.direction === "out"
                             ? "text-compute-100"
                             : log.direction === "in"
-                              ? "text-ai-100"
+                              ? "text-compute-100"
                               : "text-foreground-200/50"
                         }`}
                       >
@@ -229,7 +229,7 @@ export function CodeModeExecuteSlide() {
                             ? "←"
                             : "·"}
                       </span>
-                      <span className="text-[12px] font-mono text-foreground-200 break-all">
+                      <span className="text-base font-mono text-foreground-200 break-all">
                         {log.text}
                       </span>
                     </div>
@@ -239,16 +239,16 @@ export function CodeModeExecuteSlide() {
             </div>
 
             {/* Output */}
-            <span className="text-[12px] font-mono text-foreground-200">
+            <span className="text-base font-mono text-foreground-200">
               Result
             </span>
-            <div className="rounded-lg border border-ai-100/40 bg-background-200 p-3 overflow-auto min-h-[8vh] max-h-[15vh]">
+            <div className="rounded-lg border border-compute-100/40 bg-background-200 p-6 overflow-auto min-h-[8vh] max-h-[15vh]">
               {output ? (
-                <pre className="text-[12px] font-mono text-foreground-100 whitespace-pre-wrap">
+                <pre className="text-base font-mono text-foreground-100 whitespace-pre-wrap">
                   {output}
                 </pre>
               ) : (
-                <p className="text-[12px] text-foreground-200/30 text-center py-2">
+                <p className="text-base text-foreground-200/30 text-center py-2">
                   No output yet
                 </p>
               )}
@@ -257,12 +257,12 @@ export function CodeModeExecuteSlide() {
         </div>
 
         {/* Bottom note */}
-        <div className="flex gap-6 text-[13px] text-foreground-200">
+        <div className="flex gap-8 text-base text-foreground-200">
           <div className="flex items-center gap-1.5">
             <span className="text-compute-100">→</span> codemode.* calls dispatched via RPC to host
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-ai-100">←</span> Tool executes on host, result returns to isolate
+            <span className="text-compute-100">←</span> Tool executes on host, result returns to isolate
           </div>
         </div>
       </div>
