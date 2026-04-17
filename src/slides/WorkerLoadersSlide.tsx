@@ -117,14 +117,14 @@ export function WorkerLoadersSlide() {
           >
             <div className="flex items-center justify-between w-full">
               <div>
-                <h2 className="text-foreground-100">Dynamic Workers</h2>
-                <p className="text-foreground-200 text-base mt-1">
-                  Secure execution of nondeterministic code
+                <h2 className="text-foreground-100">Dynamic <span className="text-accent-100">Workers</span></h2>
+                <p className="text-foreground-200 mt-1">
+                  Secure execution of untrusted code
                 </p>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); setFlipped(true) }}
-                className="shrink-0 px-5 py-1.5 rounded border border-compute-100/40 bg-compute-100/10 text-compute-100 hover:bg-compute-100/20 text-base font-mono transition-colors"
+                className="shrink-0 px-5 py-1.5 rounded border border-accent-100/40 bg-accent-100/10 text-accent-100 hover:bg-accent-100/20 text-base font-mono transition-colors"
               >
                 try it →
               </button>
@@ -135,7 +135,7 @@ export function WorkerLoadersSlide() {
               <div className="flex-1">
                 <Highlight theme={themes.github} code={setupCode} language="javascript">
                   {({ tokens, getLineProps, getTokenProps }) => (
-                    <div className="rounded-lg border border-compute-100 bg-background-200 p-6 h-full overflow-auto">
+                    <div className="rounded-lg border border-accent-100/40 bg-background-200 p-6 h-full overflow-auto">
                       <pre className="text-base md:text-base font-mono whitespace-pre leading-relaxed">
                         {tokens.map((line, i) => (
                           <div key={i} {...getLineProps({ line })}>
@@ -185,7 +185,7 @@ export function WorkerLoadersSlide() {
             <div className="flex items-center justify-between w-full">
               <div>
                 <h2 className="text-foreground-100">
-                  Try it — <span className="text-compute-100">Dynamic Worker</span>
+                  Try it — Dynamic <span className="text-accent-100">Worker</span>
                 </h2>
               </div>
               <button
@@ -206,7 +206,7 @@ export function WorkerLoadersSlide() {
                     onClick={() => { setCode(t.code); setOutput(null) }}
                     className={`px-2.5 py-1 rounded text-base font-mono transition-colors ${
                       code === t.code
-                        ? "bg-compute-100/20 text-compute-100 border border-compute-100/40"
+                        ? "bg-accent-100/20 text-accent-100 border border-accent-100/40"
                         : "bg-background-200 text-foreground-200 border border-border-100 hover:text-foreground-100"
                     }`}
                   >
@@ -251,7 +251,7 @@ export function WorkerLoadersSlide() {
                   <button
                     onClick={runCode}
                     disabled={running}
-                    className="px-4 py-1.5 rounded bg-compute-100 text-white text-base font-medium hover:bg-compute-100/90 disabled:opacity-50 transition-colors"
+                    className="px-4 py-1.5 rounded bg-accent-100 text-white text-base font-medium hover:bg-accent-100/90 disabled:opacity-50 transition-colors"
                   >
                     {running ? "Running..." : "▶ Run"}
                   </button>
@@ -260,14 +260,16 @@ export function WorkerLoadersSlide() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   spellCheck={false}
-                  className="flex-1 min-h-[200px] rounded-lg border border-compute-100 bg-background-300 p-6 font-mono text-base text-foreground-100 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-compute-100"
+                  className="flex-1 min-h-[200px] rounded-lg border border-accent-100/40 bg-background-300 p-6 font-mono text-base text-foreground-100 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-accent-100"
                 />
               </div>
 
               {/* Output */}
               <div className="flex-1 flex flex-col gap-2">
-                <span className="text-base font-mono text-foreground-200">output</span>
-                <div className="flex-1 min-h-[200px] rounded-lg border border-compute-100/30 bg-background-200 p-6 overflow-auto">
+                <div className="flex items-center h-[36px]">
+                  <span className="text-base font-mono text-foreground-200">output</span>
+                </div>
+                <div className="flex-1 min-h-[200px] rounded-lg border border-accent-100/40 bg-background-200 p-6 overflow-auto">
                   {output ? (
                     <pre className="font-mono text-base text-foreground-100 whitespace-pre-wrap leading-relaxed">
                       {output}

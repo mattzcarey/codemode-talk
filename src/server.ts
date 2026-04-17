@@ -1,7 +1,5 @@
 import { routeAgentRequest, callable } from "agents";
 import { AIChatAgent, type OnChatMessageOptions } from "@cloudflare/ai-chat";
-import { createCodeTool } from "@cloudflare/codemode/ai";
-import { DynamicWorkerExecutor } from "@cloudflare/codemode";
 import { getSandbox } from "@cloudflare/sandbox";
 import {
   streamText,
@@ -10,41 +8,8 @@ import {
   pruneMessages,
 } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { createTools } from "./tools";
 
 export { Sandbox } from "@cloudflare/sandbox";
-
-const tools = createTools();
-
-export class CodemodeTalk extends AIChatAgent<Env> {
-  async onChatMessage() {
-    const openai = createOpenAI({ apiKey: this.env.OPENAI_API_KEY });
-    const executor = new DynamicWorkerExecutor({ loader: this.env.LOADER });
-
-    const codemode = createCodeTool({
-      tools,
-      executor,
-    });
-
-    const result = streamText({
-      model: openai("gpt-5.4"),
-      system:
-        "You are a helpful project management assistant. " +
-        "You can create and manage projects, tasks, sprints, and comments using the codemode tool. " +
-        "When you need to perform operations, use the codemode tool to write JavaScript " +
-        "that calls the available functions on the `codemode` object.",
-      messages: pruneMessages({
-        messages: await convertToModelMessages(this.messages),
-        toolCalls: "before-last-2-messages",
-        reasoning: "before-last-message",
-      }),
-      tools: { codemode },
-      stopWhen: stepCountIs(10),
-    });
-
-    return result.toUIMessageStreamResponse();
-  }
-}
 
 // ── Cloudflare API Agent (MCP client for mcp.cloudflare.com) ─────────
 
@@ -70,7 +35,7 @@ export class CloudflareApi extends AIChatAgent<Env> {
     if (existing) return { id: existing.id, state: "ready" };
     const result = await this.addMcpServer(
       "cloudflare",
-      "https://staging.mcp.cloudflare.com/mcp",
+      "https://mcp.cloudflare.com/mcp",
       { callbackHost: this.env.HOST }
     );
     return result;
@@ -99,44 +64,77 @@ export class CloudflareApi extends AIChatAgent<Env> {
   }
 }
 
-// Register connectServer as callable (workaround: @callable() decorator
-// crashes the Vite module runner which doesn't support TC39 decorators)
 callable()(
   CloudflareApi.prototype.connectServer,
   { kind: "method", name: "connectServer" } as ClassMethodDecoratorContext
 );
 
-/** Build the fns map from AI SDK tools for the executor. */
-function buildFns(toolSet: ReturnType<typeof createTools>) {
-  const fns: Record<string, (args: unknown) => Promise<unknown>> = {};
-  for (const [name, t] of Object.entries(toolSet)) {
-    fns[name] = async (args: unknown) =>
-      (t as unknown as { execute: (args: unknown) => Promise<unknown> }).execute(args);
-  }
-  return fns;
-}
-
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    // Execute user code via the codemode SDK with codemode.* proxy (code-mode-execute slide)
+    // Mock codemode execute for the Code Mode SDK slide
     if (url.pathname === "/api/codemode-execute" && request.method === "POST") {
-      try {
-        const { code } = (await request.json()) as { code: string };
-        const executor = new DynamicWorkerExecutor({ loader: env.LOADER });
-        const fns = buildFns(createTools());
-        const result = await executor.execute(code, fns);
-        return Response.json(result);
-      } catch (err) {
-        return Response.json(
-          { error: err instanceof Error ? err.message : "Execution failed", logs: [] },
-          { status: 500 }
-        );
+      const { code } = (await request.json()) as { code: string };
+      const logs: string[] = [];
+
+      // Parse codemode.* calls from the code to build a realistic mock
+      const calls = code.match(/codemode\.(\w+)/g) ?? [];
+      const calledFns = calls.map((c) => c.replace("codemode.", ""));
+
+      const mocks: Record<string, unknown> = {
+        listWorkers: [
+          { name: "codemode-talk", modified_on: "2026-04-09T10:00:00Z" },
+          { name: "agents-mcp", modified_on: "2026-04-08T14:30:00Z" },
+          { name: "pm-saas", modified_on: "2026-04-07T09:15:00Z" },
+        ],
+        deployWorker: { id: "w-" + crypto.randomUUID().slice(0, 8), name: "hello-world-" + Math.random().toString(36).slice(2, 8), etag: "v1" },
+        createAccessApp: { id: "app-" + crypto.randomUUID().slice(0, 8), name: "hello-world-demo", domain: "hello-world-demo.mattzcarey.workers.dev" },
+        createAccessPolicy: { id: "pol-" + crypto.randomUUID().slice(0, 8), decision: "allow" },
+        listZones: [{ id: "z-abc123", name: "mattzcarey.com", status: "active" }],
+        listDnsRecords: [
+          { id: "r1", type: "A", name: "mattzcarey.com", content: "192.0.2.1", proxied: true },
+          { id: "r2", type: "CNAME", name: "www", content: "mattzcarey.com", proxied: true },
+        ],
+        purgeCache: { id: "purge-" + crypto.randomUUID().slice(0, 8), success: true },
+      };
+
+      // Build a result that looks like the code ran
+      let result: unknown;
+      if (calledFns.length === 1 && calledFns[0] in mocks) {
+        const raw = mocks[calledFns[0]];
+        if (Array.isArray(raw) && code.includes(".slice(0, 3)")) {
+          result = (raw as unknown[]).slice(0, 3).map((w: unknown) => {
+            const worker = w as Record<string, unknown>;
+            return { name: worker.name, modified: worker.modified_on };
+          });
+        } else {
+          result = raw;
+        }
+      } else {
+        // Multi-call: return a composite
+        const composite: Record<string, unknown> = {};
+        for (const fn of calledFns) {
+          if (fn in mocks) composite[fn] = mocks[fn];
+        }
+        if (code.includes("deployed")) {
+          composite.deployed = "hello-world-" + Math.random().toString(36).slice(2, 8);
+          composite.url = composite.deployed + ".mattzcarey.workers.dev";
+        }
+        if (code.includes("access")) {
+          composite.access = "matt-only";
+        }
+        if (code.includes("toISOString")) {
+          composite.at = new Date().toISOString();
+        }
+        result = composite;
       }
+
+      for (const fn of calledFns) logs.push(`codemode.${fn}() → ok`);
+      return Response.json({ result, logs });
     }
 
-    // Execute raw code in a V8 isolate (worker-loaders slide)
+    // Execute raw code in a V8 isolate (dynamic-workers slide)
     if (url.pathname === "/api/execute" && request.method === "POST") {
       try {
         const { code, globalOutbound, nodeCompat } = (await request.json()) as {
@@ -146,7 +144,6 @@ export default {
         };
         const allowOutbound = globalOutbound === "default";
 
-        // Build the isolate module inline (same shape as DynamicWorkerExecutor)
         const wrappedCode = `async () => { ${code} }`;
         const module = [
           'import { WorkerEntrypoint } from "cloudflare:workers";',
@@ -206,7 +203,7 @@ export default {
         return new Response("Session ID required", { status: 400 });
       }
       try {
-        const sandbox = getSandbox(env.Sandbox, "talk-sandbox");
+        const sandbox = getSandbox(env.Sandbox, "sandbox-v7");
         const session = await sandbox.getSession(sessionId);
         return await session.terminal(request);
       } catch (err) {

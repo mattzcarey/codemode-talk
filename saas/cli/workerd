@@ -1,0 +1,7 @@
+#!/bin/sh
+rexy "$@" &
+PID=$!
+trap "kill -9 $PID 2>/dev/null; exit 0" INT TERM
+sleep 3
+kill -9 $PID 2>/dev/null
+wait $PID 2>/dev/null

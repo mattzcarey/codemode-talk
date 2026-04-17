@@ -56,6 +56,21 @@ const total = groups.reduce((n, g) => n + g.endpoints.length, 0)
 
 export function ExampleIntroSlide() {
   const [revealed, setRevealed] = useState(false)
+  const [curlResult, setCurlResult] = useState<string | null>(null)
+  const [curlRunning, setCurlRunning] = useState(false)
+
+  const runFetch = async () => {
+    setCurlRunning(true)
+    setCurlResult(null)
+    try {
+      const r = await fetch("https://pm-saas.mattzcarey.workers.dev/api/stats")
+      const data = await r.json()
+      setCurlResult(JSON.stringify(data, null, 2))
+    } catch {
+      setCurlResult("// failed to reach API")
+    }
+    setCurlRunning(false)
+  }
 
   return (
     <SlideContainer showDots={!revealed}>
@@ -69,22 +84,50 @@ export function ExampleIntroSlide() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-foreground-100">
-              Example Time
-            </h2>
-            <p className="text-foreground-200 text-lg max-w-lg text-center">
+            <div className="flex items-center justify-between w-full">
+              <h2 className="text-foreground-100">
+                Example <span className="text-accent-100">Time</span>
+              </h2>
+              <button
+                onClick={() => setRevealed(true)}
+                className="shrink-0 px-5 py-1.5 rounded border border-accent-100/40 bg-accent-100/10 text-accent-100 hover:bg-accent-100/20 text-base font-mono transition-colors"
+              >
+                API →
+              </button>
+            </div>
+            <p className="text-foreground-200 max-w-lg text-center">
               We have a <span className="text-accent-100 font-medium">Project Management API</span>.{" "}
               Projects, sprints, tasks, comments — the usual stuff.
             </p>
-            <p className="text-foreground-200 text-lg max-w-lg text-center">
+            <p className="text-foreground-200 max-w-lg text-center">
               How do we give an agent access to <span className="text-accent-100 font-medium">{total} endpoints</span>?
             </p>
-            <button
-              onClick={() => setRevealed(true)}
-              className="rounded-lg border border-accent-100/40 bg-accent-100/10 px-6 py-3 text-base font-medium text-accent-100 hover:bg-accent-100/20 transition-colors"
-            >
-              show the API →
-            </button>
+
+            {/* Live fetch */}
+            <div className="w-full max-w-2xl flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 rounded-lg border border-border-100 bg-background-200 px-4 py-2.5 font-mono text-sm text-foreground-200">
+                  fetch(<span className="text-accent-100">"https://pm-saas.mattzcarey.workers.dev/api/stats"</span>)
+                </div>
+                <button
+                  onClick={runFetch}
+                  disabled={curlRunning}
+                  className={`shrink-0 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors ${
+                    curlRunning
+                      ? "bg-accent-100/20 text-accent-100/50 cursor-wait"
+                      : "bg-accent-100 text-white hover:bg-accent-100/90"
+                  }`}
+                >
+                  {curlRunning ? "Running..." : "Run"}
+                </button>
+              </div>
+              {curlResult && (
+                <div className="rounded-lg border border-border-100 bg-background-200 px-4 py-3 max-h-32 overflow-auto">
+                  <pre className="font-mono text-sm text-foreground-100 whitespace-pre-wrap">{curlResult}</pre>
+                </div>
+              )}
+            </div>
+
           </motion.div>
         ) : (
           <motion.div
@@ -99,7 +142,7 @@ export function ExampleIntroSlide() {
                 <h2 className="text-foreground-100">
                   <span className="text-accent-100">Project Management</span> API
                 </h2>
-                <p className="text-foreground-200 text-base mt-1">
+                <p className="text-foreground-200 mt-1">
                   {total} REST endpoints · Cloudflare Worker + D1
                 </p>
               </div>

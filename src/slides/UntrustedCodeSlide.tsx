@@ -9,7 +9,6 @@ const scary = [
 
 const historical = [
   { name: "DSLs", desc: "Restrict what users can express", verdict: "Limited" },
-  { name: "Docker", desc: "Isolate in containers", verdict: "Slow (seconds to start)" },
   { name: "VMs", desc: "Strong isolation", verdict: "Heavy & expensive" },
   { name: "Code review", desc: "Human verification", verdict: "Doesn't scale" },
 ]

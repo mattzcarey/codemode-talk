@@ -11,14 +11,14 @@ const segments = [
 export function ContextWindowSlide() {
   return (
     <SlideContainer>
-      <div className="flex flex-col items-center gap-10 max-w-3xl">
-        <h2 className="text-center text-foreground-100">
-          We Filled the Context Window
+      <div className="flex flex-col items-center gap-10 max-w-5xl">
+        <h2 className="text-center text-foreground-100 whitespace-nowrap">
+          We Filled the <span className="text-accent-100">Context Window</span>
         </h2>
 
         {/* Big number */}
         <div className="flex items-baseline gap-6">
-          <span className="text-6xl md:text-7xl font-medium text-accent-100 tracking-tight">
+          <span className="text-7xl md:text-9xl font-medium text-accent-100 tracking-tight">
             2.3M
           </span>
           <span className="text-xl text-foreground-200">

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite dev",
     "build": "vite build",
-    "deploy": "vite build && wrangler deploy",
+    "deploy": "vite build && wrangler deploy --var HOST:https://codemode-talk.mattzcarey.workers.dev",
     "types": "wrangler types env.d.ts"
   },
   "dependencies": {

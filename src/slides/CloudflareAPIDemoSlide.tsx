@@ -183,8 +183,8 @@ function CloudflareAPIChat({ sessionId, onReset }: { sessionId: string; onReset:
         <h2 className="text-foreground-100">
           <span className="text-accent-100">Cloudflare</span> MCP
         </h2>
-        <p className="text-foreground-200 text-base mt-1">
-          Real Cloudflare API via remote MCP server
+        <p className="text-foreground-200 mt-1">
+          mcp.cloudflare.com — search + execute via code mode
         </p>
       </div>
 

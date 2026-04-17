@@ -65,7 +65,7 @@ export function BackToMCPSlide() {
           <h2 className="text-foreground-100">
             Back to <span className="text-accent-100">MCP</span>
           </h2>
-          <p className="text-foreground-200 text-base mt-1">
+          <p className="text-foreground-200 mt-1">
             Code mode completes the picture
           </p>
         </div>

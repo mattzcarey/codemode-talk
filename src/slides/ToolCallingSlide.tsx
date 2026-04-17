@@ -51,12 +51,14 @@ export function ToolCallingSlide() {
   return (
     <SlideContainer showDots={false}>
       <div className="flex flex-col items-center gap-8 scale-[0.9] md:scale-100 origin-top">
-        <h2 className="text-center text-foreground-100 mb-2">
-          Giving Agents <span className="text-accent-100">Hands</span>
-        </h2>
-        <p className="text-center text-foreground-200 text-base mb-8">
-          Tool / Function Calling
-        </p>
+        <div className="text-center">
+          <h2 className="text-foreground-100">
+            Giving Agents <span className="text-accent-100">Hands</span>
+          </h2>
+          <p className="text-foreground-200 mt-2">
+            Tool / Function Calling
+          </p>
+        </div>
 
         <div className="flex flex-col items-center w-[500px]">
           {/* User */}

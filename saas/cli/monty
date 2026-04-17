@@ -1,0 +1,15 @@
+#!/bin/sh
+exec uv run --with pydantic-monty python -c "
+import sys, json, asyncio, pydantic_monty
+
+user_code = sys.argv[1]
+code = 'return ' + user_code
+
+m = pydantic_monty.Monty(code, type_check=False)
+
+async def main():
+    return await m.run_async()
+
+output = asyncio.run(main())
+print(json.dumps(output, default=str, indent=2))
+" "$1"

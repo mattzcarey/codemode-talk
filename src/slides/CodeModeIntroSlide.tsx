@@ -8,7 +8,7 @@ export function CodeModeIntroSlide() {
           <h2 className="text-foreground-100">
             <span className="text-accent-100">Code Mode</span>
           </h2>
-          <p className="text-foreground-200 text-base mt-1">
+          <p className="text-foreground-200 mt-1">
             Instead of calling tools one-by-one, the LLM writes code against a typed SDK
           </p>
         </div>

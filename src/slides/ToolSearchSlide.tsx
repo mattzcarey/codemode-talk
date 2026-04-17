@@ -2,26 +2,84 @@ import { SlideContainer } from "@/components"
 import { useState, useMemo } from "react"
 
 const tools = [
-  { name: "GET /api/projects", description: "List all projects", parameters: "" },
-  { name: "POST /api/projects", description: "Create a new project", parameters: "name, description" },
-  { name: "GET /api/projects/:id", description: "Get a single project by ID", parameters: "id" },
-  { name: "PATCH /api/projects/:id", description: "Update a project's name or description", parameters: "id, name, description" },
-  { name: "DELETE /api/projects/:id", description: "Delete a project and all its data", parameters: "id" },
-  { name: "GET /api/projects/:id/sprints", description: "List sprints for a project", parameters: "projectId" },
-  { name: "POST /api/projects/:id/sprints", description: "Create a sprint for a project", parameters: "projectId, name, startDate, endDate" },
-  { name: "GET /api/sprints/:id", description: "Get a single sprint by ID", parameters: "id" },
-  { name: "PATCH /api/sprints/:id", description: "Update a sprint's name, dates, or status", parameters: "id, name, startDate, endDate, status" },
-  { name: "DELETE /api/sprints/:id", description: "Delete a sprint", parameters: "id" },
-  { name: "GET /api/projects/:id/tasks", description: "List tasks for a project with filters", parameters: "projectId, status, priority, assignee, sprint_id" },
-  { name: "GET /api/tasks", description: "List all tasks across projects", parameters: "status, priority, assignee" },
-  { name: "POST /api/projects/:id/tasks", description: "Create a task in a project", parameters: "projectId, title, description, status, priority, assignee, sprintId" },
-  { name: "GET /api/tasks/:id", description: "Get a single task by ID", parameters: "id" },
-  { name: "PATCH /api/tasks/:id", description: "Update a task's fields like status, assignee, priority", parameters: "id, title, description, status, priority, assignee, sprintId" },
-  { name: "DELETE /api/tasks/:id", description: "Delete a task and its comments", parameters: "id" },
-  { name: "GET /api/tasks/:id/comments", description: "List comments on a task", parameters: "taskId" },
-  { name: "POST /api/tasks/:id/comments", description: "Add a comment to a task", parameters: "taskId, content, author" },
-  { name: "DELETE /api/comments/:id", description: "Delete a comment", parameters: "id" },
-  { name: "GET /api/stats", description: "Get counts of projects, tasks, sprints, comments", parameters: "" },
+  // Workers
+  { name: "workers.list", description: "List all Workers scripts in an account", parameters: "" },
+  { name: "workers.create", description: "Create a new Worker script", parameters: "name, script" },
+  { name: "workers.deploy", description: "Deploy a Worker script with bindings and routes", parameters: "name, script, bindings, routes" },
+  { name: "workers.update", description: "Update an existing Worker script", parameters: "name, script" },
+  { name: "workers.delete", description: "Delete a Worker script", parameters: "name" },
+  { name: "workers.tail", description: "Start a real-time tail session for a Worker", parameters: "name, filters" },
+  { name: "workers.getLogs", description: "Fetch recent logs for a Worker", parameters: "name, since, until" },
+  { name: "workers.getSettings", description: "Fetch Worker account settings", parameters: "" },
+  { name: "workers.uploadAssets", description: "Upload static assets for a Worker", parameters: "name, assets" },
+  // DNS
+  { name: "dns.listRecords", description: "List DNS records for a zone", parameters: "zoneId, type, name" },
+  { name: "dns.createRecord", description: "Create a DNS record", parameters: "zoneId, type, name, content, ttl, proxied" },
+  { name: "dns.updateRecord", description: "Update an existing DNS record", parameters: "zoneId, recordId, type, name, content" },
+  { name: "dns.deleteRecord", description: "Delete a DNS record", parameters: "zoneId, recordId" },
+  // KV
+  { name: "kv.listNamespaces", description: "List KV namespaces in an account", parameters: "" },
+  { name: "kv.get", description: "Read a value from a KV namespace", parameters: "namespaceId, key" },
+  { name: "kv.put", description: "Write a key-value pair to a KV namespace", parameters: "namespaceId, key, value, metadata" },
+  { name: "kv.delete", description: "Delete a key from a KV namespace", parameters: "namespaceId, key" },
+  { name: "kv.listKeys", description: "List keys in a KV namespace", parameters: "namespaceId, prefix, limit, cursor" },
+  // R2
+  { name: "r2.listBuckets", description: "List R2 storage buckets", parameters: "" },
+  { name: "r2.createBucket", description: "Create a new R2 bucket", parameters: "name, locationHint" },
+  { name: "r2.deleteBucket", description: "Delete an R2 bucket", parameters: "bucket" },
+  { name: "r2.getObject", description: "Get an object from an R2 bucket", parameters: "bucket, key" },
+  { name: "r2.putObject", description: "Upload an object to an R2 bucket", parameters: "bucket, key, body, contentType" },
+  { name: "r2.deleteObject", description: "Delete an object from an R2 bucket", parameters: "bucket, key" },
+  { name: "r2.setCors", description: "Set CORS policy for an R2 bucket", parameters: "bucket, rules" },
+  // D1
+  { name: "d1.listDatabases", description: "List D1 SQL databases", parameters: "" },
+  { name: "d1.createDatabase", description: "Create a new D1 database", parameters: "name" },
+  { name: "d1.query", description: "Execute a SQL query on a D1 database", parameters: "databaseId, sql, params" },
+  // Zones
+  { name: "zones.list", description: "List all zones (domains) in an account", parameters: "name, status" },
+  { name: "zones.get", description: "Get details for a specific zone", parameters: "zoneId" },
+  { name: "zones.getSettings", description: "Get all settings for a zone", parameters: "zoneId" },
+  { name: "zones.editSettings", description: "Edit multiple zone settings", parameters: "zoneId, settings" },
+  { name: "zones.purgeCache", description: "Purge cached content for a zone", parameters: "zoneId, files, tags, everything" },
+  // Firewall
+  { name: "firewall.listRules", description: "List IP access rules", parameters: "zoneId" },
+  { name: "firewall.createRule", description: "Create an IP access rule", parameters: "zoneId, expression, action, priority" },
+  { name: "firewall.updateRule", description: "Update an IP access rule", parameters: "zoneId, ruleId, expression, action" },
+  { name: "firewall.deleteRule", description: "Delete an IP access rule", parameters: "zoneId, ruleId" },
+  { name: "firewall.lockdown", description: "Update a zone lockdown rule", parameters: "zoneId, urls, configurations" },
+  // Access
+  { name: "access.listApps", description: "List Access applications", parameters: "" },
+  { name: "access.createApp", description: "Create an Access application", parameters: "name, domain, type" },
+  { name: "access.deleteApp", description: "Delete an Access application", parameters: "appId" },
+  { name: "access.createPolicy", description: "Create an Access policy", parameters: "appId, decision, include, exclude" },
+  { name: "access.listPortals", description: "List MCP Portals", parameters: "" },
+  { name: "access.createPortal", description: "Create a new MCP Portal", parameters: "name, servers" },
+  // Load Balancers
+  { name: "lb.listMonitorGroups", description: "List load balancer monitor groups", parameters: "" },
+  { name: "lb.createMonitorGroup", description: "Create a monitor group", parameters: "name, monitors" },
+  // Logpush
+  { name: "logpush.listJobs", description: "List Logpush jobs", parameters: "" },
+  { name: "logpush.createJob", description: "Create a Logpush job", parameters: "dataset, destinationConf, enabled" },
+  { name: "logpush.deleteJob", description: "Delete a Logpush job", parameters: "jobId" },
+  // Stream
+  { name: "stream.listVideos", description: "List uploaded videos", parameters: "" },
+  { name: "stream.uploadVideo", description: "Initiate a video upload via TUS", parameters: "file, meta" },
+  { name: "stream.deleteVideo", description: "Delete a video", parameters: "videoId" },
+  // AI Gateway
+  { name: "aiGateway.create", description: "Create a new AI Gateway", parameters: "name, rateLimiting" },
+  { name: "aiGateway.listLogs", description: "List AI Gateway logs", parameters: "gatewayId, since, until" },
+  { name: "aiGateway.patchLog", description: "Patch an AI Gateway log entry", parameters: "gatewayId, logId, feedback" },
+  // Waiting Rooms
+  { name: "waitingRooms.list", description: "List waiting rooms for account", parameters: "" },
+  // SSL
+  { name: "ssl.getSettings", description: "Get SSL/TLS settings for a zone", parameters: "zoneId" },
+  { name: "ssl.updateSettings", description: "Update SSL/TLS mode for a zone", parameters: "zoneId, mode" },
+  // Analytics
+  { name: "analytics.get", description: "Get analytics data for a zone", parameters: "zoneId, since, until, metrics" },
+  { name: "analytics.workers", description: "Get Workers analytics and usage", parameters: "scriptName, since, until" },
+  // DDoS
+  { name: "ddos.getStatus", description: "Get DDoS protection status for a zone", parameters: "zoneId" },
+  { name: "ddos.createOverride", description: "Create a DDoS managed rule override", parameters: "zoneId, ruleId, action" },
 ]
 
 function simpleBM25(query: string, docs: typeof tools): { tool: typeof tools[0]; score: number }[] {
@@ -81,9 +139,9 @@ export function ToolSearchSlide() {
       <div className="flex flex-col items-center gap-8 w-full max-w-4xl">
         <div className="text-center">
           <h2 className="text-foreground-100">
-            <span className="text-accent-100">Tool Search</span>
+            Tool <span className="text-accent-100">Search</span>
           </h2>
-          <p className="text-foreground-200 text-base mt-1">
+          <p className="text-foreground-200 mt-1">
             The agent gets one tool: <span className="font-mono text-compute-100">search()</span> — to find the others
           </p>
         </div>

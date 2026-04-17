@@ -144,7 +144,7 @@ export function CodeModeDemoSlide() {
           <h2 className="text-foreground-100">
             <span className="text-accent-100">Code Mode</span> Demo
           </h2>
-          <p className="text-foreground-200 text-base mt-1">
+          <p className="text-foreground-200 mt-1">
             Live agent with PM tools — search + execute via Dynamic Workers
           </p>
         </div>

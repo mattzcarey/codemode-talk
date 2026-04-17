@@ -18,9 +18,7 @@ export function ThankYouSlide() {
           {/* Code Mode */}
           <div className="rounded-lg border border-accent-100 bg-accent-100/10 px-8 py-4">
             <p className="text-foreground-100">
-              <span className="font-mono text-accent-100">SDK:</span>{" "}
-              <span className="font-mono text-sm">@cloudflare/codemode</span>
-              <span className="text-foreground-200 text-sm"> (beta)</span>
+              <span className="font-mono text-accent-100">npm i agents</span>
             </p>
           </div>
 

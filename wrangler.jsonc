@@ -12,10 +12,6 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "CodemodeTalk",
-        "class_name": "CodemodeTalk"
-      },
-      {
         "name": "Sandbox",
         "class_name": "Sandbox"
       },
@@ -44,7 +40,7 @@
     }
   ],
   "vars": {
-    "HOST": "https://codemode-talk.mattzcarey.workers.dev"
+    "HOST": "http://localhost:5173"
   },
   "ai": {
     "binding": "AI"

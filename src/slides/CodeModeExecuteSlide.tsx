@@ -146,7 +146,7 @@ export function CodeModeExecuteSlide() {
           <h2 className="text-foreground-100">
             <span className="text-accent-100">Code Mode:</span> Execute
           </h2>
-          <p className="text-foreground-200 text-base mt-1">
+          <p className="text-foreground-200 mt-1">
             Code runs in a V8 isolate — not on the agent
           </p>
         </div>

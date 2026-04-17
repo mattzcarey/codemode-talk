@@ -28,7 +28,7 @@ export function SplitServersSlide() {
           <h2 className="text-foreground-100">
             Split by <span className="text-accent-100">Domain</span>
           </h2>
-          <p className="text-foreground-200 text-base mt-2">
+          <p className="text-foreground-200 mt-2">
             One MCP server per product. Each agent only loads the tools it needs.
           </p>
         </div>

@@ -6,7 +6,7 @@ export function TitleSlide() {
       <div className="flex w-full max-w-5xl flex-col items-center gap-8 md:flex-row md:items-center md:justify-between md:gap-16">
         {/* Text content */}
         <div className="flex flex-col gap-8 text-center md:text-left">
-          <h1 className="text-foreground-100 md:text-[5rem] md:leading-[105%]">
+          <h1 className="text-foreground-100 md:text-[5.5rem] md:leading-[105%]">
             Every API is a<br />
             Tool for <span className="text-accent-100">Agents</span>
           </h1>
@@ -15,9 +15,6 @@ export function TitleSlide() {
             <h3 className="text-foreground-100">Matt Carey</h3>
             <p className="text-foreground-200">
               Agents & MCP at Cloudflare
-            </p>
-            <p className="text-foreground-200">
-              MCP TS SDK Maintainer
             </p>
             <a
               href="https://twitter.com/mattzcarey"
@@ -30,7 +27,7 @@ export function TitleSlide() {
           </div>
 
           <p className="mt-3 font-mono text-base text-foreground-200">
-            MCP Dev Summit
+            AI Engineer Europe
           </p>
         </div>
 
